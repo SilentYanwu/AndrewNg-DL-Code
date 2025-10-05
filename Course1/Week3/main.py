@@ -280,10 +280,6 @@ def calculate_accuracy(predictions, Y):
     # 方法1：使用更简洁的方式计算准确率
     accuracy = np.mean(predictions == Y) * 100
     
-    # 方法2：修复原来的计算方式（如果需要保持原有逻辑）
-    # accuracy = float((np.dot(Y, predictions.T) + np.dot(1 - Y, 1 - predictions.T)) / float(Y.size) * 100)
-    # accuracy = accuracy.item()  # 确保提取标量值
-    
     return accuracy
 
 
@@ -305,20 +301,20 @@ print('准确率: {:.2f}%'.format(accuracy))
 
 # 测试不同隐藏层大小的代码也需要相应调整
 plt.figure(figsize=(16, 32))
-hidden_layer_sizes = [1, 2, 3, 4, 5, 10, 20, 50]  # 隐藏层数量
+hidden_layer_sizes = [1, 2, 3, 4, 5, 10, 20, 50]
 
 for i, n_h in enumerate(hidden_layer_sizes):
-    plt.subplot(3, 3, i + 1)  # 创建3行3列的子图布局
-    plt.title('Hidden Layer of size %d' % n_h)
+    plt.subplot(3, 3, i + 1)
     
-    # 训练模型并绘制决策边界
     parameters = nn_model(X, Y, n_h, num_iterations=5000)
     plot_decision_boundary(lambda x: predict(parameters, x.T), X, Y)
     
-    # 计算准确率
     predictions = predict(parameters, X)
     accuracy = calculate_accuracy(predictions, Y)
-    print("隐藏层的节点数量： {}  ，准确率: {:.2f} %".format(n_h, accuracy))
+    
+    # 在标题中显示准确率
+    plt.title(f'Hidden Layer size: {n_h}, Accuracy: {accuracy:.2f}%')
+    print(f"隐藏层的节点数量：{n_h}，准确率: {accuracy:.2f}%")
 
-plt.tight_layout()  # 自动调整子图间距
-plt.show()  # 在所有子图都绘制完成后一次性显示
+plt.tight_layout()
+plt.show()
