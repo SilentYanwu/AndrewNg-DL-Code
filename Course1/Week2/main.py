@@ -26,8 +26,16 @@ def fix_paths():
 fix_paths()
 
 from lr_utils import load_dataset
-
+# 加载数据集
 train_set_x_orig , train_set_y , test_set_x_orig , test_set_y , classes = load_dataset()
+
+'''
+train_set_x_orig ：保存的是训练集里面的图像数据（本训练集有209张64x64的图像）。
+train_set_y_orig ：保存的是训练集的图像对应的分类值（【0 | 1】，0表示不是猫，1表示是猫）。
+test_set_x_orig ：保存的是测试集里面的图像数据（本训练集有50张64x64的图像）。
+test_set_y_orig ： 保存的是测试集的图像对应的分类值（【0 | 1】，0表示不是猫，1表示是猫）。
+classes ： 保存的是以bytes类型保存的两个字符串数据，数据为：[b’non-cat’ b’cat’]。
+'''
 
 m_train = train_set_y.shape[1] #训练集里图片的数量。
 m_test = test_set_y.shape[1] #测试集里图片的数量。
@@ -44,6 +52,7 @@ print ("测试集_图片的维数: " + str(test_set_x_orig.shape))
 print ("测试集_标签的维数: " + str(test_set_y.shape))
 
 #将训练集的维度降低并转置。
+# train_set_x_orig 是一个维度为(m_​​train，num_px，num_px，3）的数组
 train_set_x_flatten  = train_set_x_orig.reshape(train_set_x_orig.shape[0],-1).T
 #将测试集的维度降低并转置。
 test_set_x_flatten = test_set_x_orig.reshape(test_set_x_orig.shape[0], -1).T
@@ -53,6 +62,7 @@ print ("训练集_标签的维数 : " + str(train_set_y.shape))
 print ("测试集降维之后的维度: " + str(test_set_x_flatten.shape))
 print ("测试集_标签的维数 : " + str(test_set_y.shape))
 
+# 标准化数据集
 train_set_x = train_set_x_flatten / 255
 test_set_x = test_set_x_flatten / 255
 
@@ -102,13 +112,15 @@ def propagate(w, b, X, Y):
     """
     m = X.shape[1]
 
-    #正向传播
-    A = sigmoid(np.dot(w.T,X) + b) #计算激活值，请参考公式2。
+    # 正向传播
+    Z=np.dot(w.T,X) + b # 请参考公式2
+    A = sigmoid(Z) # 计算激活值
     cost = (- 1 / m) * np.sum(Y * np.log(A) + (1 - Y) * (np.log(1 - A))) #计算成本，请参考公式3和4。
-
-    #反向传播
-    dw = (1 / m) * np.dot(X, (A - Y).T) #请参考视频中的偏导公式。
-    db = (1 / m) * np.sum(A - Y) #请参考视频中的偏导公式。
+    # 计算dZ
+    dZ = A - Y
+    # 反向传播的参数计算
+    dw = (1 / m) * np.dot(X, dZ.T) #请参考视频中的偏导公式。
+    db = (1 / m) * np.sum(dZ) #请参考视频中的偏导公式。
 
     #使用断言确保我的数据是正确的
     assert(dw.shape == w.shape)
@@ -139,7 +151,7 @@ def optimize(w , b , X , Y , num_iterations , learning_rate , print_cost = False
     返回：
         params  - 包含权重w和偏差b的字典
         grads  - 包含权重和偏差相对于成本函数的梯度的字典
-        成本 - 优化期间计算的所有成本列表，将用于绘制学习曲线。
+        costs - 优化期间计算的所有成本列表，将用于绘制学习曲线。
 
     提示：
     我们需要写下两个步骤并遍历它们：
@@ -155,7 +167,7 @@ def optimize(w , b , X , Y , num_iterations , learning_rate , print_cost = False
 
         dw = grads["dw"]
         db = grads["db"]
-
+        #更新梯度
         w = w - learning_rate * dw
         b = b - learning_rate * db
 
@@ -243,7 +255,8 @@ def model(X_train , Y_train , X_test , Y_test , num_iterations = 2000 , learning
             "num_iterations" : num_iterations }
     return d
 
-d = model(train_set_x, train_set_y, test_set_x, test_set_y, num_iterations = 2000, learning_rate = 0.005, print_cost = True)
+'''
+d = model(train_set_x, train_set_y, test_set_x, test_set_y, num_iterations = 2000, learning_rate = 0.05, print_cost = True)
 
 #绘制图
 costs = np.squeeze(d['costs'])
@@ -251,4 +264,26 @@ plt.plot(costs)
 plt.ylabel('cost')
 plt.xlabel('iterations (per hundreds)')
 plt.title("Learning rate =" + str(d["learning_rate"]))
+plt.show()
+'''
+
+# 不同学习率的比较
+learning_rates = [0.02,0.007,0.002]
+models = {}
+for i in learning_rates:
+    print ("learning rate is: " + str(i))
+    models[str(i)] = model(train_set_x, train_set_y, test_set_x, test_set_y, num_iterations = 2000, learning_rate = i, print_cost = False)
+    print ('\n' + "-------------------------------------------------------" + '\n')
+
+for i in learning_rates:
+    plt.plot(np.squeeze(models[str(i)]["costs"]), label= str(models[str(i)]["learning_rate"]))
+
+# cost 成本
+# Interations 迭代次数
+plt.ylabel('cost') 
+plt.xlabel('iterations')
+
+legend = plt.legend(loc='upper center', shadow=True)
+frame = legend.get_frame()
+frame.set_facecolor('0.90')
 plt.show()

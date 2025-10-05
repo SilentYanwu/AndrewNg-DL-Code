@@ -5,19 +5,23 @@
 import numpy as np
 
 def layer_sizes_test_case():
-    np.random.seed(1)
-    X_assess = np.random.randn(5, 3)
-    Y_assess = np.random.randn(2, 3)
+    """测试神经网络各层尺寸计算函数的测试用例"""
+    np.random.seed(1)  # 设置随机种子保证结果可重现
+    X_assess = np.random.randn(5, 3)  # 输入数据：5个特征，3个样本
+    Y_assess = np.random.randn(2, 3)  # 输出标签：2个输出类别，3个样本
     return X_assess, Y_assess
 
 def initialize_parameters_test_case():
-    n_x, n_h, n_y = 2, 4, 1
+    """测试参数初始化函数的测试用例"""
+    n_x, n_h, n_y = 2, 4, 1  # 定义网络结构：输入层2节点，隐藏层4节点，输出层1节点
     return n_x, n_h, n_y
 
 def forward_propagation_test_case():
+    """测试前向传播函数的测试用例"""
     np.random.seed(1)
-    X_assess = np.random.randn(2, 3)
+    X_assess = np.random.randn(2, 3)  # 输入数据：2个特征，3个样本
 
+    # 预定义的网络参数（权重和偏置）
     parameters = {'W1': np.array([[-0.00416758, -0.00056267],
         [-0.02136196,  0.01640271],
         [-0.01793436, -0.00841747],
@@ -32,8 +36,11 @@ def forward_propagation_test_case():
     return X_assess, parameters
 
 def compute_cost_test_case():
+    """测试成本计算函数的测试用例"""
     np.random.seed(1)
-    Y_assess = np.random.randn(1, 3)
+    Y_assess = np.random.randn(1, 3)  # 真实标签
+    
+    # 网络参数
     parameters = {'W1': np.array([[-0.00416758, -0.00056267],
         [-0.02136196,  0.01640271],
         [-0.01793436, -0.00841747],
@@ -45,14 +52,18 @@ def compute_cost_test_case():
         [ 0.]]),
      'b2': np.array([[ 0.]])}
 
+    # 前向传播的输出（预测值）
     a2 = (np.array([[ 0.5002307 ,  0.49985831,  0.50023963]]))
 
     return a2, Y_assess, parameters
 
 def backward_propagation_test_case():
+    """测试反向传播函数的测试用例"""
     np.random.seed(1)
-    X_assess = np.random.randn(2, 3)
-    Y_assess = np.random.randn(1, 3)
+    X_assess = np.random.randn(2, 3)  # 输入数据
+    Y_assess = np.random.randn(1, 3)  # 真实标签
+    
+    # 网络参数
     parameters = {'W1': np.array([[-0.00416758, -0.00056267],
         [-0.02136196,  0.01640271],
         [-0.01793436, -0.00841747],
@@ -64,6 +75,7 @@ def backward_propagation_test_case():
         [ 0.]]),
      'b2': np.array([[ 0.]])}
 
+    # 前向传播的缓存（中间结果）
     cache = {'A1': np.array([[-0.00616578,  0.0020626 ,  0.00349619],
          [-0.05225116,  0.02725659, -0.02646251],
          [-0.02009721,  0.0036869 ,  0.02883756],
@@ -77,6 +89,8 @@ def backward_propagation_test_case():
     return parameters, cache, X_assess, Y_assess
 
 def update_parameters_test_case():
+    """测试参数更新函数的测试用例"""
+    # 当前网络参数
     parameters = {'W1': np.array([[-0.00615039,  0.0169021 ],
         [-0.02311792,  0.03137121],
         [-0.0169217 , -0.01752545],
@@ -88,6 +102,7 @@ def update_parameters_test_case():
         [ -2.54560700e-06]]),
  'b2': np.array([[  9.14954378e-05]])}
 
+    # 梯度值（反向传播计算得到）
     grads = {'dW1': np.array([[ 0.00023322, -0.00205423],
         [ 0.00082222, -0.00700776],
         [-0.00031831,  0.0028636 ],
@@ -102,14 +117,18 @@ def update_parameters_test_case():
     return parameters, grads
 
 def nn_model_test_case():
+    """测试整个神经网络模型的测试用例"""
     np.random.seed(1)
-    X_assess = np.random.randn(2, 3)
-    Y_assess = np.random.randn(1, 3)
+    X_assess = np.random.randn(2, 3)  # 输入数据
+    Y_assess = np.random.randn(1, 3)  # 输出标签
     return X_assess, Y_assess
 
 def predict_test_case():
+    """测试预测函数的测试用例"""
     np.random.seed(1)
-    X_assess = np.random.randn(2, 3)
+    X_assess = np.random.randn(2, 3)  # 待预测的输入数据
+    
+    # 训练好的网络参数
     parameters = {'W1': np.array([[-0.00615039,  0.0169021 ],
         [-0.02311792,  0.03137121],
         [-0.0169217 , -0.01752545],

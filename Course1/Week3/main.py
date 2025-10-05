@@ -13,19 +13,33 @@ import sklearn.datasets
 import sklearn.linear_model
 from planar_utils import plot_decision_boundary, sigmoid, load_planar_dataset, load_extra_datasets
 
-#%matplotlib inline #如果你使用用的是Jupyter Notebook的话请取消注释。
-
 np.random.seed(1) #设置一个固定的随机种子，以保证接下来的步骤中我们的结果是一致的。
 
+# 数据导入与展示
 X, Y = load_planar_dataset()
-#plt.scatter(X[0, :], X[1, :], c=Y, s=40, cmap=plt.cm.Spectral) #绘制散点图
+plt.scatter(X[0, :], X[1, :], c=Y, s=40, cmap=plt.cm.Spectral) #绘制散点图
+plt.title("Data Set")
+plt.show()
+
 shape_X = X.shape
 shape_Y = Y.shape
 m = Y.shape[1]  # 训练集里面的数量
-
 print ("X的维度为: " + str(shape_X))
 print ("Y的维度为: " + str(shape_Y))
 print ("数据集里面的数据有：" + str(m) + " 个")
+
+# 使用逻辑回归分类(上周的方法)
+def Logistic_Regression(X, Y):
+    clf = sklearn.linear_model.LogisticRegressionCV()
+    clf.fit(X.T, Y.T)
+    LR_predictions  = clf.predict(X.T) #预测结果
+    print ("逻辑回归的准确性： %d " % float((np.dot(Y, LR_predictions) + 
+		np.dot(1 - Y,1 - LR_predictions)) / float(Y.size) * 100) +
+       "% " + "(正确标记的数据点所占的百分比)")
+    plot_decision_boundary(lambda x: clf.predict(x), X, Y)
+    plt.title("Logistic Regression")
+    plt.show()
+
 
 def layer_sizes(X , Y):
     """
@@ -59,7 +73,8 @@ def initialize_parameters( n_x , n_h ,n_y):
             b2 - 偏向量，维度为（n_y，1）
 
     """
-    np.random.seed(2) #指定一个随机种子，以便你的输出与我们的一样。
+    np.random.seed(2) #指定一个随机种子，以便保持输出一致
+    # 这表示生成一个形状为 (n_h, n_x) 的矩阵，每个元素都是标准正态分布的随机数
     W1 = np.random.randn(n_h,n_x) * 0.01
     b1 = np.zeros(shape=(n_h, 1))
     W2 = np.random.randn(n_y,n_h) * 0.01
@@ -71,6 +86,7 @@ def initialize_parameters( n_x , n_h ,n_y):
     assert(W2.shape == ( n_y , n_h ))
     assert(b2.shape == ( n_y , 1 ))
 
+    # 字典类型变量
     parameters = {"W1" : W1,
                   "b1" : b1,
                   "W2" : W2,
@@ -93,10 +109,12 @@ def forward_propagation( X , parameters ):
     W2 = parameters["W2"]
     b2 = parameters["b2"]
     #前向传播计算A2
+    
     Z1 = np.dot(W1 , X) + b1
     A1 = np.tanh(Z1)
     Z2 = np.dot(W2 , A1) + b2
     A2 = sigmoid(Z2)
+    
     #使用断言确保我的数据格式是正确的
     assert(A2.shape == (1,X.shape[1]))
     cache = {"Z1": Z1,
@@ -124,12 +142,11 @@ def compute_cost(A2,Y,parameters):
     W2 = parameters["W2"]
 
     #计算成本
-    logprobs = logprobs = np.multiply(np.log(A2), Y) + np.multiply((1 - Y), np.log(1 - A2))
+    logprobs = np.multiply(np.log(A2), Y) + np.multiply((1 - Y), np.log(1 - A2))
     cost = - np.sum(logprobs) / m
     cost = float(np.squeeze(cost))
 
     assert(isinstance(cost,float))
-
     return cost
 
 def backward_propagation(parameters,cache,X,Y):
@@ -219,6 +236,7 @@ def nn_model(X,Y,n_h,num_iterations,print_cost=False):
     W2 = parameters["W2"]
     b2 = parameters["b2"]
 
+    # 梯度下降循环
     for i in range(num_iterations):
         A2 , cache = forward_propagation(X,parameters)
         cost = compute_cost(A2,Y,parameters)
@@ -268,26 +286,39 @@ def calculate_accuracy(predictions, Y):
     
     return accuracy
 
-parameters = nn_model(X, Y, n_h = 4, num_iterations=10000, print_cost=True)
+
+Logistic_Regression(X, Y) #先使用逻辑回归进行分类
+
+#建立神经网络模型
+parameters = nn_model(X, Y, n_h = 8, num_iterations=10000, print_cost=True)
 
 #绘制边界
 plot_decision_boundary(lambda x: predict(parameters, x.T), X, Y)
-plt.title("Decision Boundary for hidden layer size " + str(4))
+plt.title("Decision Boundary for hidden layer size " + str(8))
+plt.show()
 
 predictions = predict(parameters, X)
 accuracy = calculate_accuracy(predictions, Y)
 print('准确率: {:.2f}%'.format(accuracy))
 
-"""
+
+
 # 测试不同隐藏层大小的代码也需要相应调整
 plt.figure(figsize=(16, 32))
-hidden_layer_sizes = [1, 2, 3, 4, 5, 20, 50] #隐藏层数量
+hidden_layer_sizes = [1, 2, 3, 4, 5, 10, 20, 50]  # 隐藏层数量
+
 for i, n_h in enumerate(hidden_layer_sizes):
-    plt.subplot(5, 2, i + 1)
+    plt.subplot(3, 3, i + 1)  # 创建3行3列的子图布局
     plt.title('Hidden Layer of size %d' % n_h)
+    
+    # 训练模型并绘制决策边界
     parameters = nn_model(X, Y, n_h, num_iterations=5000)
     plot_decision_boundary(lambda x: predict(parameters, x.T), X, Y)
+    
+    # 计算准确率
     predictions = predict(parameters, X)
     accuracy = calculate_accuracy(predictions, Y)
     print("隐藏层的节点数量： {}  ，准确率: {:.2f} %".format(n_h, accuracy))
-"""
+
+plt.tight_layout()  # 自动调整子图间距
+plt.show()  # 在所有子图都绘制完成后一次性显示
