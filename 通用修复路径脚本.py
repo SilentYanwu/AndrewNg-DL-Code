@@ -12,5 +12,3 @@ def fix_paths():
 
 # 在导入lr_utils之前调用
 fix_paths()
-
-from lr_utils import load_dataset

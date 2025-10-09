@@ -52,9 +52,9 @@ def layer_sizes(X , Y):
      n_h - 隐藏层的数量
      n_y - 输出层的数量
     """
-    n_x = X.shape[0] #输入层
-    n_h = 4 #，隐藏层，硬编码为4
-    n_y = Y.shape[0] #输出层
+    n_x = X.shape[0]  # 输入层节点数: 2
+    n_h = 4           # 隐藏层节点数: 4 (可调整)
+    n_y = Y.shape[0]  # 输出层节点数: 1
 
     return (n_x,n_h,n_y)
 
@@ -180,7 +180,12 @@ def backward_propagation(parameters,cache,X,Y):
              "db1": db1,
              "dW2": dW2,
              "db2": db2 }
-
+    '''
+        dW2: (1, 4) - W2的梯度
+        db2: (1, 1) - b2的梯度
+        dW1: (4, 2) - W1的梯度
+        db1: (4, 1) - b1的梯度
+    '''
     return grads
 
 def update_parameters(parameters,grads,learning_rate=1.2):
@@ -227,6 +232,7 @@ def nn_model(X,Y,n_h,num_iterations,print_cost=False):
      """
 
     np.random.seed(3) #指定随机种子
+    
     n_x = layer_sizes(X, Y)[0]
     n_y = layer_sizes(X, Y)[2]
 
