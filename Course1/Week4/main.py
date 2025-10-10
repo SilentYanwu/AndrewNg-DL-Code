@@ -296,7 +296,9 @@ def linear_activation_backward(dA,cache,activation="relu"):
     """
     linear_cache, activation_cache = cache
     if activation == "relu":
+        # 先反向传播激活函数
         dZ = relu_backward(dA, activation_cache)
+        # 再反向传播线性部分
         dA_prev, dW, db = linear_backward(dZ, linear_cache)
     elif activation == "sigmoid":
         dZ = sigmoid_backward(dA, activation_cache)
@@ -345,13 +347,33 @@ def L_model_backward(AL,Y,caches):
     dAL = - (np.divide(Y, AL) - np.divide(1 - Y, 1 - AL))
     
     current_cache = caches[L-1]
+    
+    # 输出层反向传播
+    # 第一次 反向传播从第L层开始，L是最后一层
+    # 这里使用sigmoid
     grads["dA" + str(L)], grads["dW" + str(L)], grads["db" + str(L)] = linear_activation_backward(dAL, current_cache, "sigmoid")
     
+    # 隐藏层反向传播（从后往前）
+    # 层索引说明：
+    # - caches索引: 0到L-2 对应 第1层到第L-1层
+    # - grads键: "dA1"到"dA{L-1}" 对应隐藏层梯度
     for l in reversed(range(L-1)):
-        current_cache = caches[l]
-        dA_prev_temp, dW_temp, db_temp = linear_activation_backward(grads["dA" + str(l + 2)], current_cache, "relu")
+        # l: caches索引 (L-2 → 0)
+        # 当前处理的是第 l+1 层
+        # 使用第 l+2 层的梯度来计算第 l+1 层的梯度
+        
+        current_cache = caches[l]  # 第 l+1 层的前向传播缓存
+        
+        # 计算第 l+1 层梯度（使用ReLU激活函数）
+        dA_prev_temp, dW_temp, db_temp = linear_activation_backward(
+            grads["dA" + str(l + 2)],  # 使用下一层的激活梯度
+            current_cache, 
+            "relu"
+        )
+        
+        # 存储第 l+1 层梯度
         grads["dA" + str(l + 1)] = dA_prev_temp
-        grads["dW" + str(l + 1)] = dW_temp
+        grads["dW" + str(l + 1)] = dW_temp  
         grads["db" + str(l + 1)] = db_temp
     
     return grads
@@ -472,7 +494,7 @@ def two_layer_model(X,Y,layers_dims,learning_rate=0.0075,num_iterations=3000,pri
     return parameters
 
 
-# 使用两层神经网络进行预测
+# 使用神经网络进行预测
 def predict(X, y, parameters):
     """
     该函数用于预测L层神经网络的结果，当然也包含两层
