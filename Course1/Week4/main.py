@@ -1,3 +1,8 @@
+'''
+https://blog.csdn.net/u013733326/article/details/79767169
+'''
+
+
 import numpy as np
 import h5py
 import matplotlib.pyplot as plt
@@ -93,7 +98,9 @@ def initialize_parameters_deep(layers_dims):
     L = len(layers_dims)
     
     for l in range(1,L):
-        parameters["W" + str(l)] = np.random.randn(layers_dims[l], layers_dims[l - 1]) / np.sqrt(layers_dims[l - 1])
+        # xavier初始化
+        # 先生成标准正态分布随机数矩阵，再 除以 根号（前一层节点数），即除以sqrt(layers_dims[l - 1])
+        parameters["W" + str(l)] = np.random.randn(layers_dims[l], layers_dims[l - 1])  /  np.sqrt(layers_dims[l - 1])
         parameters["b" + str(l)] = np.zeros((layers_dims[l], 1))
         
     #使用断言确保我的数据格式是正确的
@@ -192,11 +199,14 @@ def L_model_forward(X,parameters):
     caches = []
     A = X
     L = len(parameters) // 2
+    # 前L-1次，A不断循环，使用relu，提取高级特征。
     for l in range(1,L):
         A_prev = A 
         A, cache = linear_activation_forward(A_prev, parameters['W' + str(l)], parameters['b' + str(l)], "relu")
         caches.append(cache)
     
+    # 第L次，使用sigmoid，输出结果。
+    # 第L次，AL可以用于计算成本函数
     AL, cache = linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], "sigmoid")
     caches.append(cache)
     
@@ -235,7 +245,7 @@ print("==============测试compute_cost==============")
 Y,AL = testCases.compute_cost_test_case()
 print("cost = " + str(compute_cost(AL, Y)))
 
-
+# 流程参考公式2和3
 # 反向传播的线性部分
 def linear_backward(dZ,cache):
     """
@@ -542,7 +552,7 @@ def L_layer_model(X, Y, layers_dims, learning_rate=0.0075, num_iterations=3000, 
 
 # 默认
 # 测试两层神经网络模型
-print("==============测试two_layer_model==============")
+print("==============开始训练two_layer_model==============")
 n_x = 12288
 n_h = 7
 n_y = 1
@@ -556,7 +566,7 @@ predictions_test = predict(test_x, test_y, parameters) #测试集
 choose1=input("这里是否进行多层神经网络的测试并预测？y/n:")
 if choose1 == "y" or choose1 == "Y":
     # 测试多层神经网络模型
-    print("==============测试L_layer_model==============")
+    print("==============开始训练L_layer_model==============")
     layers_dims = [12288, 20, 7, 5, 1] #  5-layer model
     parameters = L_layer_model(train_x, train_y, layers_dims, num_iterations = 2500, print_cost = True,isPlot=True)
     print("==============多层神经网络开始predict==============")
@@ -597,21 +607,28 @@ def preprocess_image(image_path, target_size=(64, 64)):
 choose2=input("这里是否进行自己的图片预测？y/n:")
 # 在预测部分使用改进的函数
 if choose2 == "y" or choose2 == "Y":
-    my_image_path = input("请输入你的图片路径（支持jpg/png/bmp等格式）:")
-    my_label_y =input("请输入你的图片标签（0代表非猫，1代表猫）:")
-     # 预处理图片 
-    my_image_processed, original_image = preprocess_image(my_image_path)
-    my_predicted_image = predict(my_image_processed, my_label_y, parameters)
-    
-    plt.imshow(original_image)
+    flag=True
+    while flag:
+        flag=False
+        my_image_path = input("请输入你的图片名称（支持jpg/png/bmp等格式）:")
+        my_label_y =input("请输入你的图片标签（0代表非猫，1代表猫）:")
+        # 预处理图片 
+        my_image_processed, original_image = preprocess_image(my_image_path)
+        my_predicted_image = predict(my_image_processed, my_label_y, parameters)
+        
+        plt.imshow(original_image)
 
-    if choose1 != "y" and choose1 != "Y":
-        print("注意：由于你没有进行多层神经网络的训练，所以这里使用的是两层神经网络的参数进行预测，预测结果可能不准确")
-    if my_predicted_image[0][0] == 1:
-        print("预测的结果为：是猫")
-    else:
-        print("预测的结果为：不是猫")
-    plt.show()
+        if choose1 != "y" and choose1 != "Y":
+            print("注意：由于你没有进行多层神经网络的训练，所以这里使用的是两层神经网络的参数进行预测，预测结果可能不准确")
+        if my_predicted_image[0][0] == 1:
+            print("预测的结果为：是猫")
+        else:
+            print("预测的结果为：不是猫")
+        plt.show()
+        
+        choose3=input("是否继续进行图片预测？y/n:")
+        if choose3 == "y" or choose3 == "Y":
+            flag=True
 
 
 
