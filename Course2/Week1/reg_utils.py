@@ -117,8 +117,10 @@ def compute_cost(a3, Y):
     cost - value of the cost function
     """
     m = Y.shape[1]
-    
-    logprobs = np.multiply(-np.log(a3),Y) + np.multiply(-np.log(1 - a3), 1 - Y)
+    # 在计算 log 前添加一个小常数 ε（例如 1e-8）
+    epsilon = 1e-8
+    logprobs = np.multiply(-np.log(a3 + epsilon), Y) + np.multiply(-np.log(1 - a3 + epsilon), 1 - Y)
+
     cost = 1./m * np.nansum(logprobs)
     
     return cost

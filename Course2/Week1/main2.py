@@ -24,6 +24,73 @@ import gc_utils     #第三部分，梯度校验
 
 train_X, train_Y, test_X, test_Y = reg_utils.load_2D_dataset(is_plot=True)
 
+def compute_cost_with_regularization(A3,Y,parameters,lambd):
+    """
+    实现公式2的L2正则化计算成本
+    
+    参数：
+        A3 - 正向传播的输出结果，维度为（输出节点数量，训练/测试的数量）
+        Y - 标签向量，与数据一一对应，维度为(输出节点数量，训练/测试的数量)
+        parameters - 包含模型学习后的参数的字典
+    返回：
+        cost - 使用公式2计算出来的正则化损失的值
+    
+    """
+    m = Y.shape[1]
+    W1 = parameters["W1"]
+    W2 = parameters["W2"]
+    W3 = parameters["W3"]
+    
+    cross_entropy_cost = reg_utils.compute_cost(A3,Y)
+    
+    L2_regularization_cost = lambd * (np.sum(np.square(W1)) + np.sum(np.square(W2))  + np.sum(np.square(W3))) / (2 * m)
+    
+    cost = cross_entropy_cost + L2_regularization_cost
+    
+    return cost
+
+#当然，因为改变了成本函数，我们也必须改变向后传播的函数， 所有的梯度都必须根据这个新的成本值来计算。
+
+def backward_propagation_with_regularization(X, Y, cache, lambd):
+    """
+    实现我们添加了L2正则化的模型的后向传播。
+    
+    参数：
+        X - 输入数据集，维度为（输入节点数量，数据集里面的数量）
+        Y - 标签，维度为（输出节点数量，数据集里面的数量）
+        cache - 来自forward_propagation（）的cache输出
+        lambda - regularization超参数，实数
+    
+    返回：
+        gradients - 一个包含了每个参数、激活值和预激活值变量的梯度的字典
+    """
+    
+    m = X.shape[1]
+    
+    (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = cache
+    
+    dZ3 = A3 - Y
+    
+    dW3 = (1 / m) * np.dot(dZ3,A2.T) + ((lambd * W3) / m )
+    db3 = (1 / m) * np.sum(dZ3,axis=1,keepdims=True)
+    
+    dA2 = np.dot(W3.T,dZ3)
+    dZ2 = np.multiply(dA2,np.int64(A2 > 0))
+    dW2 = (1 / m) * np.dot(dZ2,A1.T) + ((lambd * W2) / m)
+    db2 = (1 / m) * np.sum(dZ2,axis=1,keepdims=True)
+    
+    dA1 = np.dot(W2.T,dZ2)
+    dZ1 = np.multiply(dA1,np.int64(A1 > 0))
+    dW1 = (1 / m) * np.dot(dZ1,X.T) + ((lambd * W1) / m)
+    db1 = (1 / m) * np.sum(dZ1,axis=1,keepdims=True)
+    
+    gradients = {"dZ3": dZ3, "dW3": dW3, "db3": db3, "dA2": dA2,
+                 "dZ2": dZ2, "dW2": dW2, "db2": db2, "dA1": dA1, 
+                 "dZ1": dZ1, "dW1": dW1, "db1": db1}
+    
+    return gradients
+    
+
 def forward_propagation_with_dropout(X,parameters,keep_prob=0.5):
     """
     实现具有随机舍弃节点的前向传播。
@@ -136,75 +203,6 @@ def backward_propagation_with_dropout(X,Y,cache,keep_prob):
     
     return gradients
 
-
-def compute_cost_with_regularization(A3,Y,parameters,lambd):
-    """
-    实现公式2的L2正则化计算成本
-    
-    参数：
-        A3 - 正向传播的输出结果，维度为（输出节点数量，训练/测试的数量）
-        Y - 标签向量，与数据一一对应，维度为(输出节点数量，训练/测试的数量)
-        parameters - 包含模型学习后的参数的字典
-    返回：
-        cost - 使用公式2计算出来的正则化损失的值
-    
-    """
-    m = Y.shape[1]
-    W1 = parameters["W1"]
-    W2 = parameters["W2"]
-    W3 = parameters["W3"]
-    
-    cross_entropy_cost = reg_utils.compute_cost(A3,Y)
-    
-    L2_regularization_cost = lambd * (np.sum(np.square(W1)) + np.sum(np.square(W2))  + np.sum(np.square(W3))) / (2 * m)
-    
-    cost = cross_entropy_cost + L2_regularization_cost
-    
-    return cost
-
-#当然，因为改变了成本函数，我们也必须改变向后传播的函数， 所有的梯度都必须根据这个新的成本值来计算。
-
-def backward_propagation_with_regularization(X, Y, cache, lambd):
-    """
-    实现我们添加了L2正则化的模型的后向传播。
-    
-    参数：
-        X - 输入数据集，维度为（输入节点数量，数据集里面的数量）
-        Y - 标签，维度为（输出节点数量，数据集里面的数量）
-        cache - 来自forward_propagation（）的cache输出
-        lambda - regularization超参数，实数
-    
-    返回：
-        gradients - 一个包含了每个参数、激活值和预激活值变量的梯度的字典
-    """
-    
-    m = X.shape[1]
-    
-    (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = cache
-    
-    dZ3 = A3 - Y
-    
-    dW3 = (1 / m) * np.dot(dZ3,A2.T) + ((lambd * W3) / m )
-    db3 = (1 / m) * np.sum(dZ3,axis=1,keepdims=True)
-    
-    dA2 = np.dot(W3.T,dZ3)
-    dZ2 = np.multiply(dA2,np.int64(A2 > 0))
-    dW2 = (1 / m) * np.dot(dZ2,A1.T) + ((lambd * W2) / m)
-    db2 = (1 / m) * np.sum(dZ2,axis=1,keepdims=True)
-    
-    dA1 = np.dot(W2.T,dZ2)
-    dZ1 = np.multiply(dA1,np.int64(A1 > 0))
-    dW1 = (1 / m) * np.dot(dZ1,X.T) + ((lambd * W1) / m)
-    db1 = (1 / m) * np.sum(dZ1,axis=1,keepdims=True)
-    
-    gradients = {"dZ3": dZ3, "dW3": dW3, "db3": db3, "dA2": dA2,
-                 "dZ2": dZ2, "dW2": dW2, "db2": db2, "dA1": dA1, 
-                 "dZ1": dZ1, "dW1": dW1, "db1": db1}
-    
-    return gradients
-    
-
-
 def model(X,Y,learning_rate=0.3,num_iterations=30000,print_cost=True,is_plot=True,lambd=0,keep_prob=1):
     """
     实现一个三层的神经网络：LINEAR ->RELU -> LINEAR -> RELU -> LINEAR -> SIGMOID
@@ -255,8 +253,7 @@ def model(X,Y,learning_rate=0.3,num_iterations=30000,print_cost=True,is_plot=Tru
         #反向传播
         ##可以同时使用L2正则化和随机删除节点，但是本次实验不同时使用。
         assert(lambd == 0  or keep_prob ==1)
-        
-        ##两个参数的使用情况
+        # 两个参数的使用情况
         if (lambd == 0 and keep_prob == 1):
             ### 不使用L2正则化和不使用随机删除节点
             grads = reg_utils.backward_propagation(X,Y,cache)
@@ -296,13 +293,13 @@ print("训练集:")
 predictions_train = reg_utils.predict(train_X, train_Y, parameters)
 print("测试集:")
 predictions_test = reg_utils.predict(test_X, test_Y, parameters)
-
 # 画出分类图像
 plt.title("Model without regularization")
 axes = plt.gca()
 axes.set_xlim([-0.75,0.40])
 axes.set_ylim([-0.75,0.65])
 reg_utils.plot_decision_boundary(lambda x: reg_utils.predict_dec(parameters, x.T), train_X, train_Y)
+
 
 # 使用L2正则化
 print("使用L2正则化")
@@ -311,22 +308,20 @@ print("使用正则化，训练集:")
 predictions_train = reg_utils.predict(train_X, train_Y, parameters)
 print("使用正则化，测试集:")
 predictions_test = reg_utils.predict(test_X, test_Y, parameters)
-
 plt.title("Model with L2-regularization")
 axes = plt.gca()
 axes.set_xlim([-0.75,0.40])
 axes.set_ylim([-0.75,0.65])
 reg_utils.plot_decision_boundary(lambda x: reg_utils.predict_dec(parameters, x.T), train_X, train_Y)
 
+
 # 使用随机删除节点
 print("使用随机删除节点")
 parameters = model(train_X, train_Y, keep_prob=0.86, learning_rate=0.3,is_plot=True)
-
 print("使用随机删除节点，训练集:")
 predictions_train = reg_utils.predict(train_X, train_Y, parameters)
 print("使用随机删除节点，测试集:")
 reg_utils.predictions_test = reg_utils.predict(test_X, test_Y, parameters)
-
 plt.title("Model with dropout")
 axes = plt.gca()
 axes.set_xlim([-0.75, 0.40])

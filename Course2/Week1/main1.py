@@ -60,6 +60,7 @@ def initialize_parameters_zeros(layers_dims):
         assert(parameters["b" + str(l)].shape == (layers_dims[l],1))
         
     return parameters
+
 # 随机初始化
 def initialize_parameters_random(layers_dims):
     """
@@ -190,8 +191,9 @@ if choose=="1":
     print("b1 = " + str(parameters["b1"]))
     print("W2 = " + str(parameters["W2"]))
     print("b2 = " + str(parameters["b2"]))
+    # 训练模型
     parameters = model(train_X, train_Y, initialization = "zeros",is_polt=True)
-
+    # 展示结果
     print ("训练集:")
     predictions_train = init_utils.predict(train_X, train_Y, parameters)
     print ("测试集:")
@@ -213,7 +215,9 @@ elif choose=="2":
     print("b1 = " + str(parameters["b1"]))
     print("W2 = " + str(parameters["W2"]))
     print("b2 = " + str(parameters["b2"]))
+    # 训练模型
     parameters = model(train_X, train_Y, initialization = "random",is_polt=True)
+    
     print("训练集：")
     predictions_train = init_utils.predict(train_X, train_Y, parameters)
     print("测试集：")
