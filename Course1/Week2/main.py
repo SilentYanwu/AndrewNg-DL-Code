@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# 逻辑回归实现分类器
+
 """
 Created on Wed Mar 21 17:25:30 2018
 
@@ -6,6 +8,7 @@ Created on Wed Mar 21 17:25:30 2018
 
 @author: Oscar
 """
+
 import os,sys
 import numpy as np
 import matplotlib.pyplot as plt

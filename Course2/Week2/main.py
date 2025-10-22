@@ -1,6 +1,11 @@
 #参考网址：
 # https://blog.csdn.net/u013733326/article/details/79907419
 # -*- coding: utf-8 -*-
+# 实现不同优化算法 如下：
+# 0. Batch Gradient Descent
+# 1. Mini-batch Gradient Descent
+# 2. Momentum
+# 3. Adam
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -59,34 +64,7 @@ def update_parameters_with_gd(parameters,grads,learning_rate):
     
     return parameters
 
-# Stochastic Gradient Descent
-# Stochastic Gradient Descent
-def update_parameters_with_sgd(parameters, grads, learning_rate, batch_size):
-    """
-    使用随机梯度下降更新参数
-    
-    参数：
-        parameters - 字典，包含了要更新的参数：
-            parameters['W' + str(l)] = Wl
-            parameters['b' + str(l)] = bl
-        grads - 字典，包含了每一个梯度值用以更新参数
-            grads['dW' + str(l)] = dWl
-            grads['db' + str(l)] = dbl 
-        learning_rate - 学习率
-        batch_size - 每个小批量的样本数（这里仅用于接口一致性，实际更新中不使用）
-    返回值：
-        parameters - 字典，包含了更新后的参数
-    """
-    
-    L = len(parameters) // 2 # 神经网络的层数
-    
-    # 更新每个参数（与GD相同的更新公式）
-    for l in range(L):
-        parameters["W" + str(l + 1)] = parameters["W" + str(l + 1)] - learning_rate * grads["dW" + str(l + 1)]
-        parameters["b" + str(l + 1)] = parameters["b" + str(l + 1)] - learning_rate * grads["db" + str(l + 1)]
-    
-    return parameters
-
+# Mini-batch Gradient Descent
 def random_mini_batches(X,Y,mini_batch_size=64,seed=0):
     """
     从（X，Y）中创建一个随机的mini-batch列表
@@ -204,6 +182,7 @@ def initialize_velocity(parameters):
     
     return v
 
+# Momentum Gradient Descent
 def update_parameters_with_momentun(parameters,grads,v,beta,learning_rate):
     """
     使用动量更新参数

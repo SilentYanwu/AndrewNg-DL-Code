@@ -1,4 +1,9 @@
 # https://blog.csdn.net/u013733326/article/details/79847918
+# -*- coding: utf-8 -*-
+# 初始化不同的参数初始化方法，如下：
+# 0. 全0初始化
+# 1. 随机初始化
+# 2. He初始化
 
 import numpy as np
 import matplotlib.pyplot as plt

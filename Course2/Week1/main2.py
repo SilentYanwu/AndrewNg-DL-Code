@@ -1,4 +1,9 @@
 # https://blog.csdn.net/u013733326/article/details/79847918
+# -*- coding: utf-8 -*-
+# 避免过拟合的方法，如下：
+# 0. 不使用正则化
+# 1. L2正则化 （用于计算loss阶段）
+# 2. 随机删除节点Dropout （用于前向传播和反向传播阶段）
 
 import numpy as np
 import matplotlib.pyplot as plt

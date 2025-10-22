@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 实现一个两层的神经网络，用于分类任务
 """
 本文博客地址：https://blog.csdn.net/u013733326/article/details/79702148
 

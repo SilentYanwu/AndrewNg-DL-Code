@@ -1,4 +1,8 @@
 # https://blog.csdn.net/u013733326/article/details/79847918
+#-*- coding: utf-8 -*-
+# 神经网络的梯度校验，如下：
+# 0. 简单的梯度校验
+# 1. 神经网络的梯度校验
 
 import numpy as np
 import matplotlib.pyplot as plt
