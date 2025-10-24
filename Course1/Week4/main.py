@@ -27,7 +27,7 @@ def fix_paths():
 
 # 在导入lr_utils之前调用
 fix_paths()
-import lr_utils #参见资料包，或者在文章底部copy
+import lr_utils 
 
 np.random.seed(1)
 
