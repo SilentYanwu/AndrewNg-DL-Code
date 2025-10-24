@@ -1,5 +1,5 @@
 '''
-PyTorch GPU 版本 - 三层神经网络训练脚本
+PyTorch GPU 版本 - 三层神经网络训练脚本识别手
 '''
 import numpy as np
 import matplotlib.pyplot as plt

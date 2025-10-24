@@ -246,7 +246,7 @@ def batch_image_prediction(model):
     print("\n📁 批量图片预测")
     print("-" * 30)
     
-    folder_path = input("请输入图片文件夹路径: ").strip().strip('"').strip("'")
+    folder_path = input("请输入图片文件夹路径，将预测其中所有图片: ").strip().strip('"').strip("'")
     
     if not os.path.exists(folder_path):
         print(f"❌ 文件夹路径不存在: {folder_path}")
