@@ -70,15 +70,25 @@ class ThreeLayerNN(nn.Module):
     def __init__(self, input_size=12288, hidden1_size=25, hidden2_size=12, output_size=6):
         super(ThreeLayerNN, self).__init__()
         self.layer1 = nn.Linear(input_size, hidden1_size)
+        self.bn1 = nn.BatchNorm1d(hidden1_size)
         self.layer2 = nn.Linear(hidden1_size, hidden2_size)
+        self.bn2 = nn.BatchNorm1d(hidden2_size)
         self.layer3 = nn.Linear(hidden2_size, output_size)
         self.relu = nn.ReLU()
-    
+        self.dropout = nn.Dropout(0.3)
+
+        # Xavier 初始化
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+                nn.init.zeros_(m.bias)
+
     def forward(self, x):
-        x = self.relu(self.layer1(x))
-        x = self.relu(self.layer2(x))
+        x = self.dropout(self.relu(self.bn1(self.layer1(x))))
+        x = self.dropout(self.relu(self.bn2(self.layer2(x))))
         x = self.layer3(x)
         return x
+
 
 # =========================================================
 # 三、模型加载函数
