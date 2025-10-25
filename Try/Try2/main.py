@@ -30,8 +30,7 @@ torch.manual_seed(1)
 np.random.seed(1)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(1)
-    
-    
+
 # =========================================================
 # 工具函数
 # =========================================================
@@ -104,36 +103,39 @@ test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 # =========================================================
 # 三、定义神经网络模型（使用DNN）
 # =========================================================
-class ThreeLayerNN(nn.Module):
-    def __init__(self, input_size=12288, hidden1_size=25, hidden2_size=12, output_size=6):
-        super(ThreeLayerNN, self).__init__()
-        self.layer1 = nn.Linear(input_size, hidden1_size)
-        self.bn1 = nn.BatchNorm1d(hidden1_size)
-        self.layer2 = nn.Linear(hidden1_size, hidden2_size)
-        self.bn2 = nn.BatchNorm1d(hidden2_size)
-        self.layer3 = nn.Linear(hidden2_size, output_size)
-        self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(0.3)
+class LLayerNet(nn.Module):
+    def __init__(self, layer_dims, dropout_prob=0.3):
+        super(LLayerNet, self).__init__()
+        layers = []
+        for i in range(1, len(layer_dims)):
+            layers.append(nn.Linear(layer_dims[i - 1], layer_dims[i]))
+            if i < len(layer_dims) - 1:
+                layers.append(nn.BatchNorm1d(layer_dims[i]))
+                layers.append(nn.ReLU())
+                layers.append(nn.Dropout(p=dropout_prob))
+        self.model = nn.Sequential(*layers)
 
         # Xavier 初始化
-        for m in self.modules():
+        for m in self.model:
             if isinstance(m, nn.Linear):
                 nn.init.xavier_uniform_(m.weight)
                 nn.init.zeros_(m.bias)
 
     def forward(self, x):
-        x = self.dropout(self.relu(self.bn1(self.layer1(x))))
-        x = self.dropout(self.relu(self.bn2(self.layer2(x))))
-        x = self.layer3(x)
-        return x
+        x = x.view(x.size(0), -1)
+        return self.model(x)  # 输出 logits（不加 sigmoid/softmax）
+
 
 
 # =========================================================
 # 四、实例化模型、损失函数和优化器
 # =========================================================
-model = ThreeLayerNN().to(device)
+Layer_dims = [12288, 64, 20, 6]  # 输入层、隐藏层1、隐藏层2、输出层
+learning_rate = 0.001 # 学习率
+L2loss = 0.0001 # 权重衰减（L2正则化）
+model = LLayerNet(Layer_dims).to(device)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=L2loss)
 
 print("模型结构:")
 print(model)
@@ -207,7 +209,8 @@ print("开始训练三层神经网络...")
 start_time = time.time()
 
 # 训练模型
-model = train_model(model, train_loader, test_loader, num_epochs=1000)
+epochs = 1000 # 训练轮数
+model = train_model(model, train_loader, test_loader, epochs)
 
 end_time = time.time()
 print(f"训练时间 = {end_time - start_time:.2f} 秒")
@@ -234,9 +237,9 @@ full_model_path = f"three_layer_nn_full_model_{acc:.2f}%.pth"
 torch.save({
     'model_state_dict': model.state_dict(),
     'model_architecture': model,
-    'input_size': 12288,
-    'hidden1_size': 25,
-    'hidden2_size': 12,
-    'output_size': 6
+    'input_size': Layer_dims[0],
+    'hidden1_size': Layer_dims[1],
+    'hidden2_size': Layer_dims[2],
+    'output_size': Layer_dims[3]
 }, full_model_path)
 print(f"✅ 完整模型已保存为 {full_model_path}")

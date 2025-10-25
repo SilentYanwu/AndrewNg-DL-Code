@@ -144,7 +144,13 @@ class LLayerNet(nn.Module):
                 layers.append(nn.ReLU())                        # 激活函数
                 layers.append(nn.Dropout(p=dropout_prob))       # 加 Dropout
         self.model = nn.Sequential(*layers)                     # nn.Sequential 是一个容器，将多个层组合在一起
-
+        
+        # Xavier 初始化
+        for m in self.model:
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+                nn.init.zeros_(m.bias)
+                
     def forward(self, x):
         x = x.view(x.size(0), -1)  # 展平图像
         out = self.model(x) #  执行前向传播
