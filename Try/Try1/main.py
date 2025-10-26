@@ -195,8 +195,8 @@ def train_model(model, train_loader, val_loader, num_epochs=50):
                 loss = criterion(outputs, labels)       # 计算损失
                 val_loss += loss.item()
 
-        avg_train_loss = running_loss / len(train_loader)
-        avg_val_loss = val_loss / len(val_loader)
+        avg_train_loss = running_loss / len(train_loader)   # 计算训练集本epoch的平均损失
+        avg_val_loss = val_loss / len(val_loader)           # 计算验证集本epoch平均损失
         train_losses.append(avg_train_loss)
         val_losses.append(avg_val_loss)
         
