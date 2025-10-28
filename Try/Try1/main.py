@@ -217,7 +217,7 @@ def train_model(model, train_loader, val_loader, num_epochs=50):
 # 八、训练模型
 # =========================================================
 Numepochs = 80
-train_model(model, train_loader, val_loader, Numepochs)
+train_model(model, train_loader, val_loader, num_epochs=Numepochs)
 # =========================================================
 # 九、测试集准确率
 # =========================================================

@@ -10,5 +10,5 @@ def fix_paths():
     # 切换到当前文件所在目录
     os.chdir(current_dir)
 
-# 在导入本地之前调用
+# 在导入本地文件/模型之前调用
 fix_paths()
