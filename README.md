@@ -39,7 +39,7 @@ Andrewng-DL-Code/
 
 ├── Course3_StructuringMachineLearningProjects/ # 课程3：结构化机器学习项目
 
-│ └── 无项目，认真刷课，准备做CNN的相关内容。
+│ └── 无项目，认真刷课，做好机器学习相关架构学习。
 
 ├── Course4_ConvolutionalNeuralNetworks/ # 课程4：卷积神经网络
 
