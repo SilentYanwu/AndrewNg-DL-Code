@@ -1,12 +1,16 @@
 环境管理：
-避免d2l_yolo环境过于混乱
+避免d2l_yolo（其主要包含troch+yolo+opencv）环境过于混乱
+d2l_yolo主体为：troch(cuda)+yolo+opencv
+
+
+
 11月2日的环境：
 d2l_yolo_2025_11.yaml
 
 
 
-
-
+可以用如下命令导出环境yaml文件
+conda env export > d2l_yolo_2025_11.yaml
 可用如下命令重新安装环境：
 conda env create -f d2l_yolo_2025_11.yaml
 
