@@ -38,7 +38,7 @@ pip install d2l==1.0.3
 # 6️⃣ 安装 YOLO（ultralytics）
 pip install ultralytics==8.3.65
 
-# 7️⃣ 安装图像与科学计算常用库（稳定且相互兼容）
+# 7️⃣ 安装图像与科学计算常用库（稳定）
 pip install opencv-python==4.8.1.78 matplotlib==3.8.4 numpy==1.26.4 pandas==2.2.3 seaborn==0.13.2 scikit-learn==1.5.2 scipy==1.14.1
 
 # 8️⃣ 安装实验与日志工具（进度条 + TensorBoard + Notebook）
