@@ -15,15 +15,11 @@ tensorflow实现三层卷积神经网络（迁移到TF 2.x版）
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras import layers, models # 不要在意这里的报错，反正4我的环境可以用
+from tensorflow.keras import layers, models # 不要在意这里的报错，反正我的环境可以用
 import cnn_utils
 import os, sys
 from PIL import Image
-import matplotlib.pyplot as plt
 
-# 设置 Matplotlib 使用支持中文的字体（Windows 推荐 SimHei）
-plt.rcParams['font.sans-serif'] = ['SimHei']   # 或者 ['Microsoft YaHei']
-plt.rcParams['axes.unicode_minus'] = False     # 解决负号显示问题
 
 # =============================
 # 路径修复

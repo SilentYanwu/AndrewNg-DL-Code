@@ -39,9 +39,11 @@ Andrewng-DL-Code/
 
 ├── Course3_StructuringMachineLearningProjects/ # 课程3：结构化机器学习项目
 
-│ └── 无项目，认真刷课，做好机器学习相关架构学习。
+│ └── 无项目，认真刷课，做好机器学习和深度学习相关架构。
 
 ├── Course4_ConvolutionalNeuralNetworks/ # 课程4：卷积神经网络
+
+│ ├── Week1/ #  第1周：建卷积神经网络模型以及应用
 
 └── Course5_SequenceModels/ # 课程5：序列模型
 

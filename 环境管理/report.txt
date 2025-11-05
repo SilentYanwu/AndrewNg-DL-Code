@@ -1,10 +1,10 @@
 环境管理：
 避免d2l_yolo（其主要包含troch+yolo+opencv）环境过于混乱
 d2l_yolo主体为：troch(cuda)+yolo+opencv
+tf2gpu主体为：tensorflow(cuda)
 
 
-
-11月2日的环境：
+当前环境：
 d2l_yolo_2025_11.yaml
 
 

@@ -1,3 +1,5 @@
+# 关于numpy实现tensorflow卷积神经网络各个部分的代码
+# 本内容主要来自CSDN何宽大大博客：https://blog.csdn.net/u013733326/article/details/80086090 第一部分
 import numpy as np
 import h5py
 import matplotlib.pyplot as plt

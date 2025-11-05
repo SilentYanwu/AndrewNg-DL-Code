@@ -1,0 +1,11 @@
+# 1️⃣ 创建新环境
+conda create -n tf_gpu python=3.10 -y
+
+# 2️⃣ 激活环境
+conda activate tf_gpu
+
+# 3️⃣ 安装 GPU 版 TensorFlow
+pip install tensorflow==2.15.0
+
+# 4️⃣ 可选：常用库
+pip install numpy matplotlib h5py scikit-learn
