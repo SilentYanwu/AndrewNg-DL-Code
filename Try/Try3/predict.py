@@ -234,23 +234,24 @@ def main(args):
 if __name__ == "__main__":
     # 修复路径（在导入本地模块之前）
     fix_paths()
-    
-    # 设置命令行参数
-    parser = argparse.ArgumentParser(description="手语CNN模型预测工具")
-    parser.add_argument('-m', '--model', type=str, default='runs/best_model.pt',
-                       help='训练好的模型文件路径 (.pt 文件)')
-    
-    # 交互式输入图片路径
-    test_image = input("📁 请输入要预测的图片路径：")
-    parser.add_argument('-i', '--input', type=str, default=test_image,
-                       help='要预测的图片路径或图片文件夹路径')
-    
-    # 解析参数
-    args = parser.parse_args()
-    
+        
     # 交互式循环预测
     continue_predicting = True
     while continue_predicting:
+    
+        # 设置命令行参数
+        parser = argparse.ArgumentParser(description="手语CNN模型预测工具")
+        parser.add_argument('-m', '--model', type=str, default='runs/best_model.pt',
+                        help='训练好的模型文件路径 (.pt 文件)')
+        
+        # 交互式输入图片路径
+        test_image = input("📁 请输入要预测的图片路径：")
+        parser.add_argument('-i', '--input', type=str, default=test_image,
+                        help='要预测的图片路径或图片文件夹路径')
+        
+        # 解析参数
+        args = parser.parse_args()
+
         # 执行预测
         main(args)
         

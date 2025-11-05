@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 import os
 import argparse
 import os, sys
+from torch.cuda.amp import GradScaler, autocast
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
 
 # 路径修复函数 - 确保模块导入和文件路径正确
 def fix_paths():
@@ -189,7 +192,9 @@ def main(args):
     # 初始化模型、损失函数和优化器
     model = SignCNN(num_classes=6).to(device)
     criterion = nn.CrossEntropyLoss()  # 交叉熵损失函数
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)  # Adam优化器
+    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, verbose=True)
+
     
     # 记录训练历史
     best_val_acc = 0.0
@@ -207,6 +212,9 @@ def main(args):
         
         # 在验证集上评估
         val_loss, val_acc = validate(model, val_loader, criterion, device)
+        
+        # 调度器根据验证集损失来调整学习率
+        scheduler.step(val_loss) 
         
         # 记录训练历史
         history['train_loss'].append(train_loss)

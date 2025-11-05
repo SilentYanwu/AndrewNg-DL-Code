@@ -37,7 +37,14 @@ class SignCNN(nn.Module):
             nn.ReLU(),           # ReLU激活函数
             nn.MaxPool2d(2, 2)   # 2x2最大池化，特征图尺寸第三次减半
         )
-        
+        ## 新增部分：
+        self.conv_block4 = nn.Sequential(
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2) 
+        )
+                
         # ⭐️ 核心改进：自适应平均池化
         # 无论输入图像尺寸如何，经过3次MaxPool后，
         # 自适应池化都会将特征图统一转换为8x8大小
@@ -48,9 +55,9 @@ class SignCNN(nn.Module):
         self.dropout = nn.Dropout(0.5)
         
         # 全连接分类器
-        # 输入维度：64通道 * 8高度 * 8宽度 = 4096
+        # 输入维度：128通道 * 8高度 * 8宽度 = 8192
         # 输出维度：num_classes个类别
-        self.classifier = nn.Linear(64 * 8 * 8, num_classes)
+        self.classifier = nn.Linear(128 * 8 * 8, num_classes)
 
     def forward(self, x):
         """
@@ -66,7 +73,8 @@ class SignCNN(nn.Module):
         x = self.conv_block1(x)  # 第一次特征提取和下采样
         x = self.conv_block2(x)  # 第二次特征提取和下采样
         x = self.conv_block3(x)  # 第三次特征提取和下采样
-        
+        ## 新增部分：
+        x = self.conv_block4(x)
         # ⭐️ 应用自适应池化，统一特征图尺寸为8x8
         x = self.adaptive_pool(x)
         

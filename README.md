@@ -43,7 +43,7 @@ Andrewng-DL-Code/
 
 ├── Course4_ConvolutionalNeuralNetworks/ # 课程4：卷积神经网络
 
-│ ├── Week1/ #  第1周：建卷积神经网络模型以及应用
+│ ├── Week1/ #  第1周：搭建卷积神经网络模型以及应用
 
 └── Course5_SequenceModels/ # 课程5：序列模型
 
@@ -53,10 +53,9 @@ Andrewng-DL-Code/
 
 原课程: Deep Learning Specialization - Coursera
 
-  
 参考教程: 何宽的CSDN博客
+具体项目目录网址：https://blog.csdn.net/u013733326/article/details/79827273
 
-  
 官方资料: 课程官方GitHub仓库
 
   
