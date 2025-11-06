@@ -1,4 +1,5 @@
-# 关于numpy实现tensorflow卷积神经网络各个部分的代码
+# 关于numpy实现卷积神经网络各个部分的代码
+# 值得注意的是，这里并没有使用任何深度学习框架
 # 本内容主要来自CSDN何宽大大博客：https://blog.csdn.net/u013733326/article/details/80086090 第一部分
 import numpy as np
 import h5py
@@ -92,7 +93,8 @@ def conv_forward(A_prev, W, b, hparameters):
     实现卷积函数的前向传播
     
     参数：
-        A_prev - 上一层的激活输出矩阵，维度为(m, n_H_prev, n_W_prev, n_C_prev)，（样本数量，上一层图像的高度，上一层图像的宽度，上一层过滤器数量）
+        A_prev - 上一层的激活输出矩阵，维度为(m, n_H_prev, n_W_prev, n_C_prev)，
+        （样本数量，上一层图像的高度，上一层图像的宽度，上一层过滤器数量）
         W - 权重矩阵，维度为(f, f, n_C_prev, n_C)，（过滤器大小，过滤器大小，上一层的过滤器数量，这一层的过滤器数量）
         b - 偏置矩阵，维度为(1, 1, 1, n_C)，（1,1,1,这一层的过滤器数量）
         hparameters - 包含了"stride"与 "pad"的超参数字典。
@@ -106,13 +108,14 @@ def conv_forward(A_prev, W, b, hparameters):
     (m , n_H_prev , n_W_prev , n_C_prev) = A_prev.shape
     
     #获取权重矩阵的基本信息
+    # f为过滤器的大小，n_C为这一层的过滤器数量
     ( f , f ,n_C_prev , n_C ) = W.shape
     
     #获取超参数hparameters的值
     stride = hparameters["stride"]
     pad = hparameters["pad"]
     
-    #计算卷积后的图像的宽度高度，参考上面的公式，使用int()来进行板除
+    #计算卷积后的图像的宽度高度，利用此公式，使用int()来进行板除
     n_H = int(( n_H_prev - f + 2 * pad )/ stride) + 1
     n_W = int(( n_W_prev - f + 2 * pad )/ stride) + 1
     
@@ -121,13 +124,13 @@ def conv_forward(A_prev, W, b, hparameters):
     
     #通过A_prev创建填充过了的A_prev_pad
     A_prev_pad = zero_pad(A_prev,pad)
-    
-    for i in range(m):                              #遍历样本
+
+    for i in range(m):                              #遍历样本（如第i张图片）
         a_prev_pad = A_prev_pad[i]                  #选择第i个样本的扩充后的激活矩阵
         for h in range(n_H):                        #在输出的垂直轴上循环
             for w in range(n_W):                    #在输出的水平轴上循环
-                for c in range(n_C):                #循环遍历输出的通道
-                    #定位当前的切片位置
+                for c in range(n_C):                #循环遍历输出的通道，即不同的卷积层
+                    #定位当前的切片位置（开始和结束位置）
                     vert_start = h * stride         #竖向，开始的位置
                     vert_end = vert_start + f       #竖向，结束的位置
                     horiz_start = w * stride        #横向，开始的位置

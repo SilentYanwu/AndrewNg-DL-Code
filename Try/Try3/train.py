@@ -192,10 +192,9 @@ def main(args):
     # 初始化模型、损失函数和优化器
     model = SignCNN(num_classes=6).to(device)
     criterion = nn.CrossEntropyLoss()  # 交叉熵损失函数
-    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4) # 加上正则化
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, verbose=True)
 
-    
     # 记录训练历史
     best_val_acc = 0.0
     history = {
