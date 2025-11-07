@@ -51,20 +51,28 @@ def get_data_loaders(data_dir, batch_size):
     """
     
     # 为训练集定义数据增强策略，提高模型泛化能力
-    train_transform = transforms.Compose([
-        transforms.Resize((IMG_SIZE, IMG_SIZE)),  # 调整图像尺寸
-        transforms.RandomHorizontalFlip(),        # 随机水平翻转
-        transforms.RandomRotation(15),            # 随机旋转 ±15度
-        transforms.ColorJitter(brightness=0.2, contrast=0.2),  # 颜色抖动
-        transforms.ToTensor(),                    # 将PIL图像转为Tensor [0,1]
-        # transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]) # 可选标准化
-    ])
-    
+    train_transform = transforms.Compose([ # 随机改变亮度和对比度 (模拟不同光照) 
+            transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.2), # 随机旋转 (模拟不同角度) 
+            transforms.RandomRotation(30), # 旋转角度可以更大 # 随机透视变换 (模拟不同拍摄角度) 
+            transforms.RandomPerspective(distortion_scale=0.2, p=0.5), # 随机裁切 (让模型关注手，而不是位置) 
+            transforms.RandomResizedCrop(IMG_SIZE, scale=(0.7, 1.0)), 
+            transforms.RandomHorizontalFlip(), 
+            transforms.ToTensor(),
+            transforms.Normalize(                       # 归一化
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        ),
+                                          ])
+
     # 验证集和测试集不需要增强，只需基础预处理
     val_test_transform = transforms.Compose([
-        transforms.Resize((IMG_SIZE, IMG_SIZE)),  # 调整图像尺寸
-        transforms.ToTensor(),                    # 将PIL图像转为Tensor
-        # transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]) # 可选标准化
+        transforms.Resize((IMG_SIZE, IMG_SIZE)),    # 调整图像尺寸
+        transforms.ToTensor(),                       # 将PIL图像转为Tensor
+        transforms.Normalize(                       # 归一化
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        ),
+        
     ])
     
     # 加载完整训练集

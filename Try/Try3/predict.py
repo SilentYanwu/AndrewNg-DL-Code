@@ -97,8 +97,11 @@ def preprocess_image(image_path_or_array):
     preprocess_transform = transforms.Compose([
         transforms.Resize((INFER_SIZE, INFER_SIZE)),  # 调整到模型训练时的尺寸
         transforms.ToTensor(),                        # 转换为Tensor并归一化到[0,1]
-        # 注意：如果训练时使用了Normalize，这里也要取消注释并使用相同的参数
-        # transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        transforms.Normalize(                       # 归一化
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        ),
+        
     ])
     
     # 4. 应用变换并增加batch维度 [C, H, W] -> [1, C, H, W]
