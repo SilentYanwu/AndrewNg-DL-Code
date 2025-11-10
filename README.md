@@ -18,6 +18,10 @@
 📖 详细注释 - 代码中包含详细的中文注释和说明
 
 
+由于本人没有学习tensorflow的想法，因此决定从Week4/Course2开始
+使用pytroch完成编程练习。
+
+
 课程结构
 Andrewng-DL-Code/
 
