@@ -149,8 +149,8 @@ def main():
         parser = argparse.ArgumentParser(description="手语 ResNet-50 模型推理工具")
         parser.add_argument('-m', '--model', type=str, default='runs/best_model.pt',
                         help='训练好的模型文件路径 (.pt 文件)')
-        test_image = input("📁 请输入要预测的图片路径：")
-        parser.add_argument('-i', '--input', type=str, default=test_image,
+        test_path = input("📁 请输入要预测的图片路径：")
+        parser.add_argument('-i', '--input', type=str, default=test_path,
                             help='要预测的图片路径或图片文件夹路径')
         args = parser.parse_args()
         

@@ -26,7 +26,7 @@ def create_resnet50(num_classes=6, use_pretrained=True, freeze_layers=True):
         # 加载没有预训练权重的模型
         model = models.resnet50(weights=None)
 
-    # 2. (可选) 冻结所有卷积层
+    # 2.冻结所有卷积层
     # 当数据集较小且与 ImageNet 差异较大时，通常先只训练分类头
     if freeze_layers and use_pretrained:
         for param in model.parameters():
