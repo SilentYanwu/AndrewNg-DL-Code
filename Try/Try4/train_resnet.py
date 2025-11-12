@@ -43,19 +43,18 @@ def get_data_loaders(data_dir, batch_size):
     # 训练集的数据增强
     train_transform = transforms.Compose([
         transforms.Resize((IMG_SIZE, IMG_SIZE)),
-        # 添加更强的增强
-        transforms.RandomHorizontalFlip(p=0.5),
-        transforms.RandomRotation(30),
+        transforms.RandomHorizontalFlip(p=0.5), 
+        transforms.RandomRotation(30), 
         transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3),
         transforms.ToTensor(),
-        transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD) # 关键：使用 ImageNet 归一化
+        transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD) # 使用 ImageNet 归一化
     ])
 
     # 验证集和测试集不需要增强
     val_test_transform = transforms.Compose([
         transforms.Resize((IMG_SIZE, IMG_SIZE)),
         transforms.ToTensor(),
-        transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD) # 关键：使用 ImageNet 归一化
+        transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD)
     ])
     
     # 加载完整训练集 (使用增强)
@@ -70,29 +69,27 @@ def get_data_loaders(data_dir, batch_size):
     val_size = len(full_train_dataset) - train_size
     
     # 使用固定的随机种子，确保每次划分一致
+    '''
+        random_split“随机”地把一个 Dataset 分成多个子集
+    '''
     train_dataset, val_dataset = random_split(
         full_train_dataset, 
         [train_size, val_size],
-        generator=torch.Generator().manual_seed(42)
+        generator=torch.Generator().manual_seed(42) # 固定随机种子
     )
     
-    # ！！重要！！ 将验证集的数据变换替换为 *不增强* 的版本
-    # random_split 后的 val_dataset 仍然指向 full_train_dataset
-    # 我们需要一个技巧来修改它的 transform
-    # 最简单的方法是重新创建一次 val_dataset，但这会重复加载数据
-    # 更高效的方式是创建一个包装器或修改 val_dataset.dataset
-    # 为了简单和安全，我们这里重新加载一次（虽然效率稍低）
-    
-    # 我们创建一个新的实例用于验证，仅为了应用正确的 transform
-    # 注意：这假设 val_dataset.indices 存储了正确的索引
-    # 一个更干净的方法是让 SignLanguageDataset 接受一个索引列表
-    # 但我们保持您原有的 dataset.py 不变，采用以下策略：
-    
-    # 策略调整：在 random_split 之后，我们修改 val_dataset 的 transform
-    # 幸运的是，PyTorch 的 Subset 对象允许我们访问其底层的 dataset
-    # 我们可以 *临时* 修改底层 dataset 的 transform
-    # 但这会带来风险，因为 train_dataset 也共享它
-    
+    # ！！！！ 上面的方法并不能用 /(ㄒoㄒ)/~~ 没有删去只是为了演示正常流程。
+    '''
+    ！！重要！！ 将验证集的数据变换替换为 *不增强* 的版本
+    random_split 后的 val_dataset 仍然指向 full_train_dataset
+    而full_train_dataset 使用的是增强的 transform。但是呢，val_dataset 应该使用不增强的 transform。
+    我们需要一个技巧来修改它的 transform
+    最简单的方法是重新创建一次 val_dataset，但这会重复加载数据
+    更高效的方式是创建一个包装器或修改 val_dataset.dataset
+    为了简单和安全，我们这里重新加载一次
+    QAQ（反正没人会看）
+
+    '''
     # 最安全、最清晰的策略：
     # 1. 加载两次 train_signs.h5
     dataset_for_train = SignLanguageDataset(
@@ -109,11 +106,11 @@ def get_data_loaders(data_dir, batch_size):
     # 2. 使用相同的种子和索引进行划分
     indices = torch.randperm(len(dataset_for_train), generator=torch.Generator().manual_seed(42)).tolist()
     train_indices = indices[:train_size]
+    # 保证和前面的是同一批数据
     val_indices = indices[train_size:]
-    
+    # Subset 数据集
     train_dataset = torch.utils.data.Subset(dataset_for_train, train_indices)
     val_dataset = torch.utils.data.Subset(dataset_for_val, val_indices)
-
 
     # 加载测试集
     test_dataset = SignLanguageDataset(
@@ -122,7 +119,6 @@ def get_data_loaders(data_dir, batch_size):
         transform=val_test_transform
     )
 
-    # 创建 DataLoaders
     # 使用 num_workers > 0 来利用您安全的 dataset.py
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
@@ -143,16 +139,15 @@ def train_one_epoch(model, loader, optimizer, criterion, device, scaler):
     running_loss = 0.0
     
     for inputs, labels in loader:
-        inputs, labels = inputs.to(device), labels.to(device)
-        
-        optimizer.zero_grad()
+        inputs, labels = inputs.to(device), labels.to(device) # 把数据移到设备（GPU/CPU）
+        optimizer.zero_grad()  # 清零梯度
         
         # 使用混合精度
-        with torch.cuda.amp.autocast():
+        with torch.amp.autocast():
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             
-        # 缩放梯度
+        # 使用 GradScaler 进行梯度缩放与更新
         scaler.scale(loss).backward()
         scaler.step(optimizer)
         scaler.update()
@@ -175,15 +170,16 @@ def validate(model, loader, criterion, device):
             inputs, labels = inputs.to(device), labels.to(device)
             
             # 评估时也使用混合精度
-            with torch.cuda.amp.autocast():
+            with torch.amp.autocast():
                 outputs = model(inputs)
                 loss = criterion(outputs, labels)
             
             running_loss += loss.item()
             
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            # 计算准确率
+            _, predicted = torch.max(outputs.detach(), 1) # 在行方向输出上取最大值
+            total += labels.size(0) # 累计样本数
+            correct += (predicted == labels).sum().item() # 累计正确预测数
             
     avg_loss = running_loss / len(loader)
     accuracy = 100 * correct / total
@@ -212,12 +208,24 @@ def main(args):
     # 5. 定义损失函数、优化器、学习率调度器
     criterion = nn.CrossEntropyLoss()
     
+    '''
+        lambda p: p.requires_grad
+        这是一段匿名函数（lambda function），相当于：
+        def condition(p):
+            return p.requires_grad
+        给我一个参数 p，我就返回它的 p.requires_grad 布尔值。
+        
+        filter() 是 Python 内置函数之一，它的作用是：
+        把可迭代对象 iterable 中的每个元素都交给函数 func() 判断，
+        只保留那些返回 True 的元素。
+    '''
     # 仅优化解冻的参数 (这里是 model.fc)
     optimizer = optim.Adam(
         filter(lambda p: p.requires_grad, model.parameters()), 
         lr=args.lr
     )
-    
+
+    # 学习率调度器，根据验证集损失调整学习率
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, verbose=True)
     
     # 6. 初始化混合精度 (AMP) 缩放器
@@ -246,7 +254,7 @@ def main(args):
             torch.save(model.state_dict(), save_path)
             print(f"  🎉 新的最佳模型! 准确率: {best_val_acc:.2f}%. 已保存到 {save_path}")
 
-    # 8. (可选但推荐) 解冻模型并进行端到端微调
+    # 8. 解冻模型并进行端到端微调
     print("\n--- 阶段 2: 解冻并微调 (End-to-End Fine-tuning) ---")
     # 解冻所有层
     for param in model.parameters():

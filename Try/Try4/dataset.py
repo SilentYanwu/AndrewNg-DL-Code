@@ -15,6 +15,7 @@ class SignLanguageDataset(Dataset):
     为每个 worker 单独打开文件句柄。
     """
     
+    
     def __init__(self, h5_path, set_name='train_set', transform=None):
         """
         构造函数：初始化数据集对象
@@ -55,7 +56,7 @@ class SignLanguageDataset(Dataset):
         # 转换为 PIL.Image 以便应用 torchvision 变换
         image = Image.fromarray(image)
 
-        # 应用数据变换（如果有的话）
+        # 应用数据变换
         if self.transform:
             image = self.transform(image)
         

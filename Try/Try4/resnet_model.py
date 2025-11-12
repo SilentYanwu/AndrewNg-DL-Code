@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torchvision import models
 
-def create_resnet50(num_classes=6, use_pretrained=True, freeze_layers=True):
+def create_resnet50(num_classes, use_pretrained=True, freeze_layers=True):
     """
     创建并配置一个 ResNet-50 模型。
 
@@ -11,7 +11,7 @@ def create_resnet50(num_classes=6, use_pretrained=True, freeze_layers=True):
         num_classes (int): 输出类别的数量 (我们的手势是 0-5, 所以是 6)。
         use_pretrained (bool): 是否加载在 ImageNet 上预训练的权重。
         freeze_layers (bool): 是否冻结预训练的卷积层 (只训练分类头)。
-                               这在 fine-tuning 时很常见。
+        这在 fine-tuning 时很常见。
     
     返回:
         model: 配置好的 ResNet-50 模型
@@ -26,21 +26,29 @@ def create_resnet50(num_classes=6, use_pretrained=True, freeze_layers=True):
         # 加载没有预训练权重的模型
         model = models.resnet50(weights=None)
 
-    # 2.冻结所有卷积层
-    # 当数据集较小且与 ImageNet 差异较大时，通常先只训练分类头
+    # 2.冻结所有卷积层参数
     if freeze_layers and use_pretrained:
         for param in model.parameters():
             param.requires_grad = False
-            
+
     # 3. 替换最后的全连接层 (分类头)
     # ResNet-50 的最后分类层叫做 'fc'
     # 它的输入特征数是 2048 (model.fc.in_features)
     
-    # 获取 'fc' 层的输入特征数
+    # 获取 'fc' 层的输入特征数 
+    '''
+        Resnet50一共有2048个特征（可以认为是2048个角度观察图片），
+        最后通过全连接层把这2048个特征映射到1000种类别上（ImageNet有1000类）。
+        而我这里，将其改成了6个类别（手势0-5）。
+    '''
     num_ftrs = model.fc.in_features
-    
-    # 将 'fc' 层替换为一个新的线性层
-    # 新的层默认 requires_grad = True
+    '''
+        原本的 model.fc 是一个 nn.Linear(2048, 1000)（对应 ImageNet 1000 类）。
+        我们替换成 nn.Linear(2048, 6)（6 个手势分类）。
+        将'fc' 层替换为一个新的线性层
+        新的层默认 requires_grad = True
+        把原来的分类头（1000类）替换成我们自己的分类头（6类）
+    ''' 
     model.fc = nn.Linear(num_ftrs, num_classes)
     
     print(f"✅ ResNet-50 模型创建成功。")
