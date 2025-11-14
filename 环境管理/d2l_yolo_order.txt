@@ -58,7 +58,7 @@ pip install opencv-python==4.8.1.78 \
 pip install jupyter notebook tensorboard tqdm
 
 # ------------------------------------------------------------
-# 9️⃣ 安装 HDF5 支持库（用于 .h5 数据集，如吴恩达课程手势识别）
+# 9️⃣ 安装 HDF5 支持库（用于 .h5 数据集，如吴恩达课程）
 # ------------------------------------------------------------
 pip install h5py==3.11.0
 
@@ -67,12 +67,4 @@ pip install h5py==3.11.0
 # ------------------------------------------------------------
 pip install streamlit==1.39.0
 
-# ------------------------------------------------------------
-# 1️⃣1️⃣ 验证安装结果
-# ------------------------------------------------------------
-python - <<'EOF'
-import torch, ultralytics, onnxruntime
-print("✅ PyTorch:", torch.__version__)
-print("✅ YOLO:", ultralytics.__version__)
-print("✅ ONNXRuntime:", onnxruntime.__version__)
-EOF
+

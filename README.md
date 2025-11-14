@@ -49,8 +49,11 @@ Andrewng-DL-Code/
 └── Course5_SequenceModels/ # 课程5：序列模型
 
 
-由于本人暂时没有学习tensorflow的想法，因此决定从Week4/Course2开始
-使用pytroch在Try中完成编程练习。
+由于本人暂时没有学习tensorflow的想法，因此决定从Course4/Week2开始之后的编程作业，这里就不完成了。
+仅仅使用pytroch在Try文件夹中完成与何宽老师CSDN博客上类似的项目练习。
+Try4 对应 Course4/Week2
+Try5 对应 Course4/Week3 本项目，我决定不模仿作业中的TF实现YOLO，而是直接利用yolo。
+
 
 
 **学习资源**

@@ -1,0 +1,6 @@
+
+conda create -n labe python=3.8 -y
+
+conda activate labe
+
+pip install PyQt5==5.15.9 labelImg==1.8.6 -i https://pypi.tuna.tsinghua.edu.cn/simple

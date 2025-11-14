@@ -15,7 +15,7 @@ tensorflow实现三层卷积神经网络（迁移到TF 2.x版）
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras import layers, models # 不要在意这里的报错，反正我的环境可以用
+from keras import layers, models 
 import cnn_utils
 import os, sys
 from PIL import Image

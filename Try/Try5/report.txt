@@ -1,0 +1,31 @@
+先划分数据集 100/11/10
+使用 auto_label.py 对的数据集进行自动标注，放到对应labels的文件夹下。
+在对其标注的数据集，进行审核，人工修改。说到人工修改，真是无语炸了，先是没有classes.txt，一会又因为labels是自动识别的，所以多出来一列。
+啊，西巴，这个破classes改不好了，就这样吧。 train中的100张，用自动预测，后面验证和测试，由人工修改。
+啊啊啊，labelimg和自动预测就不是能兼容的，看看有没有什么办法，绑死Try5中的classes.txt
+似乎有个办法，来看一看。
+以下代码，可以绑死某文件夹里的labels指向某个类文件。（已经没有办法了，距离我写出自动打标签的代码已经半天过去了）
+bash
+在正常启动labelimg的python环境里输入：
+    labelImg datasets/images/train datasets/classes.txt datasets/labels/train
+
+    labelImg datasets/images/val datasets/classes.txt datasets/labels/val
+
+    labelImg datasets/images/test datasets/classes.txt datasets/labels/test
+
+算了，失败了，它还是会自己修改内部的classes.txt 
+
+还是按照一开始的思路吧，先去吃饭吧，要饿死了。
+重新战斗！！！为了保证数据的统一性
+train,val,test的全部数据采用自动预测。                                                  2025/11/14
+
+之后的流程就较为简单了
+1.写好data.yaml
+2.写好各类脚本
+3.调好参数
+
+
+
+
+
+
