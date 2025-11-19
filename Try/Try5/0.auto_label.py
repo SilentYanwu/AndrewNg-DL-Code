@@ -1,9 +1,15 @@
-import os, sys
+# -*- coding: utf-8 -*-
+"""
+自动使用 YOLOv8 对图片进行自动标注
+支持 train/val/test 分类标注并自动生成 LabelImg 的 classes.txt
+"""
+import os
+import sys
 import shutil
 from ultralytics import YOLO
 
 # ----------------------------------
-# 修复路径
+# 修复当前脚本路径
 # ----------------------------------
 def fix_paths():
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,16 +20,14 @@ def fix_paths():
 fix_paths()
 
 # ----------------------------------
-# 配置路径
+# 配置
 # ----------------------------------
-IMAGE_DIR = "datasets/images/test"
-LABEL_DIR = "datasets/labels/test"
-VIS_DIR = "datasets/vis/test"
+BASE_IMAGE_DIR = "datasets/images"
+BASE_LABEL_DIR = "datasets/labels"
+BASE_VIS_DIR   = "datasets/vis"
 RUNS_DIR = "runs/detect"
-TEMP_DIR = "runs/detect/auto_label/labels"
-CLASSES_TXT = os.path.join(LABEL_DIR, "classes.txt")
+YOLO_TEMP_LABEL_DIR = "runs/detect/auto_label/labels"
 
-# coco80 类别名称（YOLOv8 内置顺序）
 COCO_CLASSES = [
     "person","bicycle","car","motorcycle","airplane","bus","train","truck","boat",
     "traffic light","fire hydrant","stop sign","parking meter","bench",
@@ -36,78 +40,112 @@ COCO_CLASSES = [
     "microwave","oven","toaster","sink","refrigerator","book","clock","vase","scissors","teddy bear","hair drier","toothbrush"
 ]
 
-# 创建目录
-os.makedirs(LABEL_DIR, exist_ok=True)
-os.makedirs(VIS_DIR, exist_ok=True)
+# ----------------------------------
+# 清空 runs/detect
+# ----------------------------------
+def clear_runs():
+    if os.path.exists(RUNS_DIR):
+        print("🧹 正在清空 runs/detect ...")
+        shutil.rmtree(RUNS_DIR)
+    print("✔ 已清空 runs/detect\n")
+
 
 # ----------------------------------
-# 0. 清空 runs/detect
+# 自动生成 classes.txt（仅生成一次）
 # ----------------------------------
-print("🧹 正在清空 runs/detect ...")
+def generate_classes_txt(label_dir):
+    classes_path = os.path.join(label_dir, "classes.txt")
+    if not os.path.exists(classes_path):
+        print("📝 正在生成 classes.txt ...")
+        with open(classes_path, "w", encoding="utf-8") as f:
+            for name in COCO_CLASSES:
+                f.write(name + "\n")
+        print(f"✔ classes.txt 已生成：{classes_path}\n")
+    else:
+        print("✔ classes.txt 已存在，无需重复生成\n")
 
-if os.path.exists(RUNS_DIR):
-    shutil.rmtree(RUNS_DIR)
-
-print("✔ 已清空 runs/detect")
-
-# ----------------------------------
-# 1. YOLO 自动标注（含可视化）
-# ----------------------------------
-print("🔍 正在使用 YOLOv8 自动标注图片...")
-model = YOLO("yolov8s.pt")
-
-results = model.predict(
-    source=IMAGE_DIR,
-    save=True,          # 保存可视化图像
-    save_txt=True,
-    save_conf=True,
-    project="runs/detect",
-    name="auto_label",
-    exist_ok=True
-)
-
-print("✅ 自动标注完成！")
 
 # ----------------------------------
-# 2. 复制 labels
+# 自动标注函数
+# split_name = train / val / test
 # ----------------------------------
-print(f"📂 正在复制标签到 {LABEL_DIR} ...")
+def auto_label(split_name):
+    image_dir = os.path.join(BASE_IMAGE_DIR, split_name)
+    label_dir = os.path.join(BASE_LABEL_DIR, split_name)
+    vis_dir   = os.path.join(BASE_VIS_DIR, split_name)
 
-if not os.path.exists(TEMP_DIR):
-    raise FileNotFoundError("未找到 YOLO 自动生成的标签目录")
+    # 创建必要目录
+    os.makedirs(label_dir, exist_ok=True)
+    os.makedirs(vis_dir, exist_ok=True)
 
-count = 0
-for file in os.listdir(TEMP_DIR):
-    if file.endswith(".txt"):
-        src = os.path.join(TEMP_DIR, file)
-        dst = os.path.join(LABEL_DIR, file)
-        shutil.copy(src, dst)
-        count += 1
+    # 检查图片目录
+    if not os.path.exists(image_dir):
+        print(f"❌ 图片目录不存在: {image_dir}")
+        return
 
-print(f"✔ 已复制 {count} 个标签文件到 {LABEL_DIR}")
+    # 清空 runs/detect
+    clear_runs()
 
-# ----------------------------------
-# 3. 保存可视化图像
-# ----------------------------------
-print("🖼 正在保存可视化检测图片 …")
+    # YOLO 检测
+    print(f"🔍 正在使用 YOLOv8 对 {split_name} 自动标注...")
+    model = YOLO("yolov8s.pt")
 
-VIS_SRC = "runs/detect/auto_label"
+    model.predict(
+        source=image_dir,
+        save=True,
+        save_txt=True,
+        save_conf=True,
+        project="runs/detect",
+        name="auto_label",
+        exist_ok=True
+    )
+    print("✔ 自动标注完成\n")
 
-if os.path.exists(VIS_SRC):
-    for file in os.listdir(VIS_SRC):
+    # 复制标签
+    print(f"📂 正在复制标签到 {label_dir} ...")
+    if not os.path.exists(YOLO_TEMP_LABEL_DIR):
+        print("❌ 未找到 YOLO 输出标签文件")
+        return
+
+    count = 0
+    for file in os.listdir(YOLO_TEMP_LABEL_DIR):
+        if file.endswith(".txt"):
+            shutil.copy(os.path.join(YOLO_TEMP_LABEL_DIR, file),
+                        os.path.join(label_dir, file))
+            count += 1
+
+    print(f"✔ 已复制 {count} 个标签文件\n")
+
+    # 复制可视化图片
+    vis_src = "runs/detect/auto_label"
+    print("🖼 正在保存可视化检测图像 …")
+    for file in os.listdir(vis_src):
         if file.lower().endswith((".jpg", ".png", ".jpeg")):
-            shutil.copy(os.path.join(VIS_SRC, file), os.path.join(VIS_DIR, file))
+            shutil.copy(os.path.join(vis_src, file), os.path.join(vis_dir, file))
+    print(f"✔ 可视化图片已保存到 {vis_dir}\n")
 
-print(f"✔ 可视化图片已保存到 {VIS_DIR}")
+    # 生成 classes.txt
+    generate_classes_txt(label_dir)
+
+    print(f"🎉 {split_name} 标注任务完成！\n")
+
 
 # ----------------------------------
-# 4. 自动生成 classes.txt
+# 主程序：选择 train / val / test
 # ----------------------------------
-print("📝 正在自动生成 LabelImg 专用 classes.txt ...")
+if __name__ == "__main__":
+    print("请选择要自动标注的图片集：")
+    print("1 - train")
+    print("2 - val")
+    print("3 - test")
 
-with open(CLASSES_TXT, "w", encoding="utf-8") as f:
-    for name in COCO_CLASSES:
-        f.write(name + "\n")
+    choice = input("请输入编号：").strip()
 
-print(f"🎉 已生成：{CLASSES_TXT}")
-print("👍 现在你可以用 LabelImg 打开图片并人工修正标签了！")
+    if choice == "1":
+        auto_label("train")
+    elif choice == "2":
+        auto_label("val")
+    elif choice == "3":
+        auto_label("test")
+    else:
+        print("❌ 输入错误，请输入 1 / 2 / 3")

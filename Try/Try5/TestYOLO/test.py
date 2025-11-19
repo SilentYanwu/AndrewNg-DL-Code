@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# 使用 YOLOv8 对单张图片进行预测的示例代码
 from ultralytics import YOLO
 import cv2
 import os,sys

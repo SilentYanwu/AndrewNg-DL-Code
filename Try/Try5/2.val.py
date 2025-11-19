@@ -10,10 +10,11 @@ def fix_paths():
     
     # 切换到当前文件所在目录
     os.chdir(current_dir)
+
 def main():
     # 在导入本地文件/模型之前调用
     fix_paths()
-    model = YOLO("runs/train/exp_yolo/weights/best.pt")
+    model = YOLO("runs/train/yolo_exp/weights/best.pt")
 
     metrics = model.val(
         data="data.yaml",
@@ -29,5 +30,5 @@ def main():
     print(metrics)
 
 if __name__ == '__main__':
-    # 在Windows上使用多进程时必须要有这个保护
+    # 在Windows上使用多进程保护
     main()

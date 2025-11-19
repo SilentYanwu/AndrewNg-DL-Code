@@ -1,7 +1,8 @@
-from ultralytics import YOLO
-import os, sys
 
-# 添加路径修复代码
+from ultralytics import YOLO
+import os
+import sys
+
 def fix_paths():
     """修复导入路径和文件路径"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -10,41 +11,56 @@ def fix_paths():
     os.chdir(current_dir)
 
 def main():
-    """主要的训练函数"""
     fix_paths()
+    # 选择YOLOv11n模型
+    model = YOLO("yolo11n.pt")
     
-    # 选择模型
-    model = YOLO("yolov8s.pt")
+    # 针对小数据集的优化配置
+    train_config = {
+        "data": "data.yaml",
+        "imgsz": 640,
+        "epochs": 80,  # 增加轮数，小模型需要更多时间收敛
+        "batch": 16,
+        "workers": 2,   # 减少workers，避免小数据集的问题
+        "device": 0,
+        "project": "runs/train",
+        "name": "yolo_exp",
+        "exist_ok": True,
+        "pretrained": True,
+        
+        # ⚡ 学习率配置 - 针对小模型调整
+        "optimizer": "AdamW",
+        "lr0": 0.002,    # 稍高的学习率，小模型收敛快
+        "lrf": 0.02,     # 最终学习率
+        "cos_lr": True,  # 余弦退火
+        
+        # 🛡️ 正则化配置
+        "weight_decay": 0.001,  # 更强的权重衰减
+        "dropout": 0.2,         # 更高的dropout率
+        
+        # 🔧 数据增强 - 适度增强
+        "augment": True,
+        "hsv_h": 0.01,
+        "hsv_s": 0.6,
+        "hsv_v": 0.3,
+        "translate": 0.08,
+        "scale": 0.4,
+        "fliplr": 0.5,
+        
+        # 📈 训练策略调整
+        "patience": 15,         # 增加耐心值， 早停机制
+        "save_period": 10,
+        "val": True,
+        "plots": True,
+        
+        # 🎯 针对小数据集的特殊配置
+        "close_mosaic": 5,      # 更早关闭mosaic增强
+        "warmup_epochs": 5,     # 更长的预热
+    }
     
     # 开始训练
-    model.train(
-        data="data.yaml",
-        imgsz=640,
-        epochs=100,
-        batch=16,
-        workers=4,  # 如果问题持续，可以尝试减少workers数量
-        device=0,
-        project="runs/train",
-        name="exp_yolo",
-        exist_ok=True,
-        # 模型配置
-        pretrained=True,       # 使用预训练权重
-        # 优化器设置
-        optimizer="auto",    # 优化器选择(auto, SGD, Adam, AdamW等)
-        lr0=0.01,           # 初始学习率
-        lrf=0.01,           # 最终学习率系数(lr0 * lrf)
-        
-        # 数据增强
-        augment=True,       # 是否启用数据增强
-        hsv_h=0.015,        # 色调增强幅度
-        hsv_s=0.7,          # 饱和度增强幅度  
-        hsv_v=0.4,          # 明度增强幅度
-        translate=0.1,      # 平移增强幅度
-        scale=0.5,          # 缩放增强幅度 
-)
-print("✅ 训练完成！")
-
+    results = model.train(**train_config)
+    return results
 # Windows多进程保护
 if __name__ == '__main__':
-    # 在Windows上使用多进程时必须要有这个保护
     main()

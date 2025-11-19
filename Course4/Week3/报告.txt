@@ -1,0 +1,5 @@
+本周的任务是使用Tensorflow构建YOLOv2的模型
+再使用现有的YOLO预训练模型，进行再训练，推理。
+可以参考何宽老师的CSDN博客：https://blog.csdn.net/u013733326/article/details/80341740
+
+由于文件较多，我本人暂时也没有相关计划，就不发出来了。

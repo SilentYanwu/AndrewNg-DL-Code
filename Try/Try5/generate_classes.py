@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+# 自动生成 LabelImg 专用 classes.txt 文件
 coco_classes = [
     "person","bicycle","car","motorcycle","airplane","bus","train","truck","boat",
     "traffic light","fire hydrant","stop sign","parking meter","bench","bird","cat",
