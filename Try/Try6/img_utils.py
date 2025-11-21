@@ -1,3 +1,4 @@
+# img_utils.py
 import torch
 import numpy as np
 import cv2
@@ -19,41 +20,39 @@ fix_paths()
 
 def img_to_encoding(image_path, model, device):
     """
-    加载图像 -> 转为 Tensor -> 归一化 -> 模型推理 -> 返回 Embedding
-    
-    Args:
-        image_path: 图片路径
-        model: 已加载的 PyTorch 模型
-        device: 'cuda' or 'cpu'
-    Returns:
-        embedding: numpy array (128,)
+    加载图像 -> Resize -> 标准化 -> 模型推理 -> 512维向量
     """
-    # 1. 读取图片 (BGR)
-    img1 = cv2.imread(image_path, 1)
-    if img1 is None:
+    # 1. 读取图片
+    img_bgr = cv2.imread(image_path)
+    if img_bgr is None:
         raise FileNotFoundError(f"无法找到图片: {image_path}")
 
     # 2. BGR -> RGB
-    img = img1[..., ::-1]
+    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
-    # 3. Resize 到模型需要的尺寸 (96x96)
-    img = cv2.resize(img, (96, 96))
+    # 3. [关键修改] Resize 到 160x160
+    # facenet-pytorch 的预训练模型是在 160x160 分辨率下训练的
+    img_rgb = cv2.resize(img_rgb, (160, 160))
 
-    # 4. 归一化 (0-255 -> 0.0-1.0) 并转置 (H,W,C) -> (C,H,W)
-    img = np.around(np.transpose(img, (2, 0, 1)) / 255.0, decimals=12)
+    # 4. [关键修改] 标准化 (Whitening)
+    # 预训练模型要求的标准化方式：(像素值 - 127.5) / 128.0
+    # 这种方式将像素归一化到 [-1, 1] 之间，而不是之前的 [0, 1]
+    img_tensor = torch.tensor(img_rgb).float()
+    img_tensor = (img_tensor - 127.5) / 128.0
+
+    # 5. 转换维度 (H,W,C) -> (C,H,W) 并增加 Batch 维度
+    # (160, 160, 3) -> (3, 160, 160) -> (1, 3, 160, 160)
+    img_tensor = img_tensor.permute(2, 0, 1).unsqueeze(0)
+
+    # 6. GPU 推理
+    img_tensor = img_tensor.to(device)
     
-    # 5. 增加 Batch 维度 (1, 3, 96, 96) 并转为 FloatTensor
-    x_train = torch.tensor(img, dtype=torch.float32).unsqueeze(0)
-    
-    # 6. 移至 GPU
-    x_train = x_train.to(device)
-
-    # 7. 推理 (No Grad 模式)
     model.eval()
     with torch.no_grad():
-        embedding = model(x_train)
+        # 输出维度通常是 (1, 512)
+        embedding = model(img_tensor)
     
-    # 8. 返回 CPU numpy 数组
+    # 返回 CPU numpy 数组
     return embedding.cpu().numpy()
 
 def load_database(database_path, model, device):

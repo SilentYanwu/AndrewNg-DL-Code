@@ -1,3 +1,4 @@
+# main.py
 import torch
 import torch.nn as nn
 import numpy as np
@@ -19,7 +20,7 @@ def fix_paths():
 fix_paths()
 
 # 导入自定义模块
-from facenet import load_model_wrapper
+from facenetnew import load_model_wrapper
 from img_utils import img_to_encoding
 
 # ---------------------------------------------------------
@@ -53,6 +54,7 @@ def main():
         neg_dist = torch.sum((anchor - negative).pow(2), dim=1)
 
         # Loss
+        # alpha 是 一个极小的正数，防止负样本距离过近
         basic_loss = pos_dist - neg_dist + alpha
         loss = torch.mean(torch.clamp(basic_loss, min=0.0))
         return loss
@@ -147,8 +149,14 @@ def main():
     # ---------------------------------------------------------
     print("\n--- 开始测试 ---")
     # 确保你有这些测试图片，否则会报错
+    print("\n--- 验证功能测试 ---")
     verify("data/images/camera_0.jpg", "younes", database, model)
     who_is_it("data/images/camera_0.jpg", database, model)
+    
+    # 使用豆包AI生成的图片进行测试
+    print("\n--- 使用豆包AI生成的图片进行测试 ---")
+    who_is_it("data/images/doubaoAIman.png", database, model)
+    who_is_it("data/images/doubaoAIwoman.png", database, model)
 
 if __name__ == "__main__":
     main()

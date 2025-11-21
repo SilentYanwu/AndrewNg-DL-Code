@@ -8,30 +8,23 @@ conda activate torchgpu
 
 # 2️⃣ 安装PyTorch生态系统
 pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install torchtext==0.18.0 torchdata==0.10.1
+pip install torchtext==0.18.0 torchdata==0.10.1 --no-deps
 
 # 3️⃣ 安装YOLO和计算机视觉库
 pip install ultralytics==8.3.65
 pip install albumentations==1.3.1  # 高效数据增强
 
+（可选）
 # 4️⃣ 安装模型部署工具链
 pip install onnx==1.16.2 onnxruntime-gpu==1.20.0 onnxslim==0.1.39
 
 # 5️⃣ 安装科学计算与数据处理
-pip install opencv-python==4.8.1.78 \
-            matplotlib==3.8.4 \
-            numpy==1.26.4 \
-            pandas==2.2.3 \
-            seaborn==0.13.2 \
-            scikit-learn==1.5.2 \
-            scipy==1.14.1 \
-            psutil==5.9.8 \
-            pyyaml==6.0.1
+pip install opencv-python==4.8.1.78 matplotlib==3.8.4 numpy==1.26.4 pandas==2.2.3 seaborn==0.13.2 scikit-learn==1.5.2 scipy==1.14.1 
+pip install psutil==5.9.8 pyyaml==6.0.1
 
 # 6️⃣ 安装开发与调试工具
-pip install jupyter notebook tensorboard tqdm \
-            ipdb==0.13.13 \
-            thop==0.1.1-220907  # 模型复杂度分析
+pip install jupyter notebook tensorboard tqdm
+（可选） pip install ipdb==0.13.13 thop==0.1.1-220907
 
 # 7️⃣ 安装其他实用工具
 pip install h5py==3.11.0
