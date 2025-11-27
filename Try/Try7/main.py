@@ -78,9 +78,9 @@ def imshow(tensor, title=None):
     plt.axis("off")
     plt.show()
 
+
 # 这里的预处理主要是归一化，我们在模型内部处理，
 # 所以外部只需要保证是 0-1 的 Tensor 即可。
-
 # 将tensor转为PIL Image对象
 def deprocess(tensor):
     image = tensor.to("cpu").clone()  
@@ -105,6 +105,29 @@ class VGGFeatures(nn.Module):
         # PyTorch VGG19 layer 索引映射 (根据官方结构)
         # block1_conv1 -> '0', block2_conv1 -> '5', ...
         # block4_conv2 -> '21' (relu4_2)
+        # 这里有兴趣可以查看下VGG的架构图
+        '''
+        索引 (Index)	层类型 (Layer Type)	层的俗称 (Paper Name)	说明
+        0	            Conv2d (64 filters)	    block1_conv1	<-- 字典中的 '0' (风格层)
+        1	            ReLU		
+        2	            Conv2d (64 filters)	    block1_conv2	
+        3	            ReLU		
+        4	            MaxPool2d		第1个池化层
+        5	            Conv2d (128 filters)	block2_conv1	<-- 字典中的 '5' (风格层)
+        6	            ReLU		
+        7	            Conv2d (128 filters)	block2_conv2	
+        8	            ReLU		
+        9	            MaxPool2d		第2个池化层
+        10	            Conv2d (256 filters)	block3_conv1	<-- 字典中的 '10' (风格层)
+        ...	...	...	中间省略 block3_conv2/3/4
+        18	            MaxPool2d		第3个池化层
+        19	            Conv2d (512 filters)	block4_conv1	<-- 字典中的 '19' (风格层)
+        20	            ReLU		
+        21	            Conv2d (512 filters)	block4_conv2	<-- 字典中的 '21' (内容层)
+        ...	...	...	
+        27	            MaxPool2d		第4个池化层
+        28	            Conv2d (512 filters)	block5_conv1	<-- 字典中的 '28' (风格层)
+        '''
         self.layers = {
             '0': 'block1_conv1',
             '5': 'block2_conv1',
@@ -115,6 +138,7 @@ class VGGFeatures(nn.Module):
         }
         
         # 只保留我们需要用到的层之前的模型部分
+        # 模型截断后，后续层的输出会为 None
         self.model = vgg[:29] 
         self.model.to(device)
 
