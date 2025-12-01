@@ -103,4 +103,4 @@ Try6 对应 Courese4/Week4 第一个项目，人脸识别
 
 Try7 对应 Courese4/Week4 第二个项目 神经风格转化 
 
-
+Try8 对应 Courese5/Week1 第三个项目 生成莎士比亚风格的文本
