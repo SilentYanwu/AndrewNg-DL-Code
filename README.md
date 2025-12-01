@@ -46,6 +46,16 @@ Andrewng-DL-Code/
 
 │ ├── Week1/ #  第1周：搭建卷积神经网络模型以及应用
 
+│ ├── Week2/ #  第2周：尝试Kears与利用Resnet网络识别手势（仅仅完成了Kears）
+
+│ ├── Week3/ #  第3周：搭建YOLOv2（未完成）
+
+│ ├── Week4/ #  第4周：人脸识别和神经风格转化
+
+│       ├── Project1/ #  第4周：人脸识别
+
+│       ├── Project2/ #  第4周：神经风格转化（未完成）
+
 └── Course5_SequenceModels/ # 课程5：序列模型
 
 **学习资源**
@@ -81,9 +91,9 @@ Andrewng-DL-Code/
 # 声明
 由于本人暂时没有学习tensorflow的想法， 
 
-因此决定从Course4/Week3开始之后的编程作业，这里就不完成了，我最多会把何宽老师项目复制过来，但不再转化为TF2.x版本，与运行代码。 
+因此决定从Course4/Week3开始之后的编程作业，这里就不完成了，我不再追求优化之类的，方便转换的就转化为TF2.x，不方便转化的，就保留博客内容。 
 
-仅仅使用pytroch在Try文件夹中完成与何宽老师CSDN博客上类似的项目练习。 
+后面计划仅仅使用pytroch在Try文件夹中完成与何宽老师CSDN博客上类似的项目练习。 
 
 Try4 对应 Course4/Week2 
 
