@@ -1,3 +1,7 @@
+'''
+Course5.Week2.Project2.main 的 Docstring
+代码参考了何宽老师的CSND博客：https://blog.csdn.net/u013733326/article/details/83341643
+'''
 import numpy as np
 import emoji
 import matplotlib.pyplot as plt
@@ -121,3 +125,16 @@ print("=====训练集====")
 pred_train = emo_utils.predict(X_train, Y_train, W, b, word_to_vec_map)
 print("=====测试集====")
 pred_test = emo_utils.predict(X_test, Y_test, W, b, word_to_vec_map)
+
+X_my_sentences = np.array(["i adore you", "i love you", "funny lol", "lets play with a ball", "food is ready", "you are not happy"])
+Y_my_labels = np.array([[0], [0], [2], [1], [4],[3]])
+
+pred = emo_utils.predict(X_my_sentences, Y_my_labels , W, b, word_to_vec_map)
+emo_utils.print_predictions(X_my_sentences, pred)
+
+print(" \t {0} \t {1} \t {2} \t {3} \t {4}".format(emo_utils.label_to_emoji(0), emo_utils.label_to_emoji(1), \
+                                                 emo_utils.label_to_emoji(2), emo_utils.label_to_emoji(3), \
+                                                 emo_utils.label_to_emoji(4)))
+import pandas as pd
+print(pd.crosstab(Y_test, pred_test.reshape(56,), rownames=['Actual'], colnames=['Predicted'], margins=True))
+emo_utils.plot_confusion_matrix(Y_test, pred_test)
