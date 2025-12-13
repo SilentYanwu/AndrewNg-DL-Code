@@ -82,9 +82,7 @@ class ShakespeareModel(nn.Module):
         c0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device)
         return (h0, c0)
 
-# --- 3. 辅助函数 ---
-
-
+# --- 3. 采样函数 ---
 def sample(preds, temperature=1.0):
     """
     从预测概率张量中采样索引的辅助函数。

@@ -12,7 +12,7 @@ from tensorflow.keras.models import load_model, Model
 from tensorflow.keras.layers import Dense, Activation, Dropout, Input, LSTM, Reshape, Lambda, RepeatVector
 from tensorflow.keras.initializers import glorot_uniform
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers.legacy import Adam as LegacyAdam
 from tensorflow.keras import backend as K # 保留 K 作为 Keras Backend 的简写
 
 # --- 假定的自定义模块导入 ---
@@ -115,7 +115,7 @@ model = djmodel(Tx=Tx, n_a=n_a, n_values=n_values,
 
 # 编译模型：使用 Adam 优化器与分类交叉熵损失。
 # TF2.x 兼容性：Adam 和其他优化器不需要 K.tf.clip_by_value 等操作，但参数与 Keras 1/2 兼容。
-opt = Adam(learning_rate=0.01, beta_1=0.9, beta_2=0.999, decay=0.01)
+opt = LegacyAdam(learning_rate=0.01, beta_1=0.9, beta_2=0.999, decay=0.01)
 model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
 # 初始化 a0 和 c0，用于训练时的初始状态 (Batch size = m)
