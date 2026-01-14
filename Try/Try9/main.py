@@ -52,7 +52,7 @@ class EnhancedImageCaptioningApp:
         
         # 检查是否需要下载模型
         model_files = os.listdir(self.caption_model_path)
-        required_files = ['config.json', 'pytorch_model.bin', 'preprocessor_config.json', 'tokenizer_config.json']
+        required_files = ['config.json', 'preprocessor_config.json', 'tokenizer_config.json']
         
         if not all(f in model_files for f in required_files):
             print(f"📥 首次运行：正在下载图像描述模型到 {self.caption_model_path}...")
