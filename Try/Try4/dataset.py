@@ -8,14 +8,12 @@ from PIL import Image
 class SignLanguageDataset(Dataset):
     """
     用于 signs.h5 数据的 PyTorch 自定义数据集
-    
-    [已修复]：
+
     这个版本是多进程安全的 (num_workers > 0)。
     它不在 __init__ 中打开 h5_file，而是在 __getitem__ 中
     为每个 worker 单独打开文件句柄。
     """
-    
-    
+
     def __init__(self, h5_path, set_name='train_set', transform=None):
         """
         构造函数：初始化数据集对象
