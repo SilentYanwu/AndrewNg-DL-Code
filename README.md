@@ -1,4 +1,4 @@
-# Andrew Ng 深度学习课程作业
+# Andrew Ng 深度学习日志
 
 本项目是学习吴恩达老师深度学习课程课后作业的Python实现。
 
@@ -74,7 +74,7 @@ Andrewng-DL-Code/
 
 │       ├── Project2/ #  第2周：Emoji表情生成器（V1和V2）
 
-│       ├── Project3  #  给生活一点留白 QAQ
+└── ─── ├── Project3  #  给生活一点留白 QAQ
 
 **学习资源**
 
@@ -88,9 +88,9 @@ Andrewng-DL-Code/
 
 ## 声明
 
-由于本人暂时没有学习tensorflow的想法， 
+由于本人暂时没有学习tensorflow的想法，并且吴老师的课程很多采用了TF1.x的编程。 
 
-因此决定从Course4/Week3开始之后的编程作业，这里就不完成了，我不再追求优化之类的，方便转换的就转化为TF2.x，不方便转化的，就保留博客内容。 
+因此决定从Course4/Week3开始之后的编程作业，这里就不完成了，其中方便升级的就转化为TF2.x，不方便转化的，就保留原博客内容。 
 
 后面计划仅仅使用pytroch在Try文件夹中完成与何宽老师CSDN博客上类似的项目练习。 
 
@@ -103,6 +103,9 @@ Try6 对应 Courese4/Week4 第一个项目，人脸识别
 Try7 对应 Courese4/Week4 第二个项目 神经风格转化 
 
 Try8 对应 Courese5/Week1 第三个项目 生成莎士比亚风格的文本
+
+Try9 是一个离线智能图像理解系统，用户上传任意图片，
+系统会先用 ViT-GPT2 模型生成英文描述（例如“A dog running in the park”），再通过 Helsinki-NLP Opus-MT 模型将其翻译为中文。
 
 
 # 最后

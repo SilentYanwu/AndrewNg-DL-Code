@@ -208,303 +208,408 @@ class EnhancedImageCaptioningApp:
 # 创建应用实例
 app = EnhancedImageCaptioningApp()
 
-# ================ Gradio 界面设计 ================
+# ================ 全新大气桌面级 UI ================
 custom_css = """
-:root {
-    --primary-color: #4f46e5;
-    --secondary-color: #7c3aed;
-    --accent-color: #10b981;
-    --bg-color: #f8fafc;
-    --card-bg: #ffffff;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
+/* 全局样式 - 专业深色主题 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0c12;
+    background-image: radial-gradient(circle at 10% 20%, rgba(25, 30, 45, 1) 0%, #0a0c12 100%);
+    min-height: 100vh;
 }
 
+/* 主容器 - 桌面宽屏布局 */
 .gradio-container {
-    max-width: 1200px !important;
+    max-width: 1600px !important;
     margin: 2rem auto !important;
-    border-radius: 24px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+    background: rgba(15, 20, 30, 0.65) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 2rem !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
     overflow: hidden !important;
 }
 
+/* 主内容区域 */
 #main-container {
-    background: var(--bg-color) !important;
-    min-height: 100vh !important;
+    padding: 2rem 2rem 1.5rem 2rem !important;
 }
 
-.header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    padding: 3rem 2rem;
+/* 头部 Hero 区域 */
+.hero-section {
     text-align: center;
-    border-radius: 0 0 40px 40px;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.header h1 {
-    font-size: 3rem;
+.hero-title {
+    font-size: 3.2rem;
     font-weight: 800;
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #c084fc, #60a5fa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
 }
 
-.header p {
-    font-size: 1.2rem;
-    opacity: 0.9;
-    max-width: 600px;
+.hero-subtitle {
+    font-size: 1.1rem;
+    color: #9ca3af;
+    max-width: 550px;
     margin: 0 auto;
 }
 
-.card {
-    background: var(--card-bg);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    margin-bottom: 2rem;
-    border: 1px solid #e2e8f0;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* 左右两栏布局 */
+.two-columns {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+.left-panel {
+    flex: 1.2;
+    min-width: 280px;
 }
 
-.tab-nav {
-    background: white;
-    border-radius: 15px;
-    padding: 0.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+.right-panel {
+    flex: 2;
+    min-width: 400px;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
-    border: none !important;
-    color: white !important;
-    font-weight: 600 !important;
-    padding: 1rem 2rem !important;
-    border-radius: 12px !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3) !important;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4) !important;
-}
-
-.upload-area {
-    border: 3px dashed #cbd5e1 !important;
-    border-radius: 20px !important;
-    background: #f1f5f9 !important;
-    min-height: 400px !important;
-}
-
-.output-box {
-    background: linear-gradient(135deg, #f8fafc, #ffffff);
-    border: 2px solid #e2e8f0;
-    border-radius: 15px;
+/* 玻璃卡片 */
+.glass-card {
+    background: rgba(25, 32, 45, 0.6);
+    backdrop-filter: blur(12px);
+    border-radius: 1.5rem;
     padding: 1.5rem;
-    margin-top: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 1.5rem;
 }
 
+.glass-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-header {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #e5e7eb;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-left: 3px solid #8b5cf6;
+    padding-left: 1rem;
+}
+
+/* 上传区域 */
+.upload-area {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 2px dashed #4b5563 !important;
+    border-radius: 1.2rem !important;
+    transition: all 0.2s;
+}
+
+.upload-area:hover {
+    border-color: #8b5cf6 !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* 按钮样式 */
+.primary-btn {
+    background: linear-gradient(95deg, #6366f1, #8b5cf6) !important;
+    border: none !important;
+    font-weight: 600 !important;
+    padding: 0.8rem 1.8rem !important;
+    border-radius: 2rem !important;
+    font-size: 1rem !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+    transition: all 0.2s !important;
+    width: 100%;
+}
+
+.primary-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5) !important;
+}
+
+.secondary-btn {
+    background: rgba(45, 55, 75, 0.8) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: #e5e7eb !important;
+    font-weight: 500 !important;
+    border-radius: 2rem !important;
+    padding: 0.5rem 1.2rem !important;
+}
+
+.secondary-btn:hover {
+    background: rgba(55, 65, 85, 0.9) !important;
+    border-color: #8b5cf6 !important;
+}
+
+/* 输出文本框 */
+.output-textbox textarea, .output-textbox input {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid #374151 !important;
+    border-radius: 1rem !important;
+    color: #f3f4f6 !important;
+    font-size: 0.95rem !important;
+    padding: 0.8rem !important;
+    font-family: 'Inter', monospace;
+}
+
+.output-textbox label {
+    color: #d1d5db !important;
+    font-weight: 500 !important;
+    margin-bottom: 0.4rem !important;
+}
+
+/* 统计卡片网格 */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     margin-top: 1rem;
 }
 
 .stat-item {
-    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 1.2rem;
     padding: 1rem;
-    border-radius: 12px;
     text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .stat-label {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+    color: #9ca3af;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    margin-top: 0.3rem;
 }
 
+/* 文件路径区域 */
+.path-box {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 1rem;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    word-break: break-all;
+}
+
+/* 底部 */
 .footer {
     text-align: center;
-    padding: 2rem;
-    color: var(--text-secondary);
-    border-top: 1px solid #e2e8f0;
-    margin-top: 3rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+    border-top: 1px solid rgba(255,255,255,0.05);
 }
 
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .gradio-container {
-        margin: 1rem !important;
-        border-radius: 16px !important;
+/* 选项卡样式 */
+.tabs {
+    background: transparent !important;
+    border: none !important;
+}
+
+.tabs > .tab-nav {
+    background: rgba(20, 28, 40, 0.7);
+    backdrop-filter: blur(8px);
+    border-radius: 1.2rem;
+    padding: 0.3rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.tabs button {
+    border-radius: 1rem !important;
+    font-weight: 500 !important;
+    padding: 0.6rem 1.5rem !important;
+    background: transparent !important;
+    color: #9ca3af !important;
+}
+
+.tabs button.selected {
+    background: rgba(99, 102, 241, 0.25) !important;
+    color: white !important;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1f2937;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* 响应式：小屏幕时变为纵向 */
+@media (max-width: 900px) {
+    .two-columns {
+        flex-direction: column;
     }
-    
-    .header h1 {
+    .left-panel, .right-panel {
+        min-width: auto;
+    }
+    .hero-title {
         font-size: 2rem;
     }
-    
-    .card {
-        padding: 1.5rem;
+    .gradio-container {
+        margin: 1rem !important;
+        border-radius: 1.5rem !important;
+    }
+    #main-container {
+        padding: 1rem !important;
     }
 }
 """
 
-# 构建界面
-with gr.Blocks(title="🌌 离线智能图像理解系统") as demo: 
-    
+# ================ 构建 UI（保持逻辑不变） ================
+with gr.Blocks(title="🌌 智能图像理解系统", theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="purple"), css=custom_css) as demo:
     with gr.Column(elem_id="main-container"):
-        # 头部区域
-        with gr.Column(elem_classes="header"):
-            gr.Markdown("""
-            # 🌌 离线智能图像理解系统
-            ### Vision + Language · 全本地运行 · 隐私安全保护
+        # 头部
+        with gr.Column(elem_classes="hero-section"):
+            gr.HTML("""
+                <div class="hero-title">🌌 智能图像理解系统</div>
+                <div class="hero-subtitle">ViT-GPT2 + Opus-MT · 全本地运行 · 企业级隐私保护</div>
             """)
         
-        # 主体内容
-        with gr.Tabs(elem_classes="tab-nav"):
-            
-            # 选项卡 1: 图像分析
-            with gr.TabItem("🔮 图像理解", id=0):
-                with gr.Row():
-                    # 左侧上传区
-                    with gr.Column(scale=1):
-                        with gr.Column(elem_classes="card"):
-                            gr.Markdown("### 🖼️ 图像上传")
+        # 选项卡（保持原有三个标签，但放在内部）
+        with gr.Tabs(elem_classes="tabs"):
+            # ---------- 图像理解 ----------
+            with gr.TabItem("🔮 图像理解"):
+                # 左右两栏布局
+                with gr.Column(elem_classes="two-columns"):
+                    # 左侧面板：上传和操作
+                    with gr.Column(elem_classes="left-panel"):
+                        with gr.Column(elem_classes="glass-card"):
+                            gr.HTML('<div class="card-header">📤 上传图像</div>')
                             input_image = gr.Image(
                                 type="pil",
-                                label="拖拽图片或点击上传",
-                                height=400,
+                                label=None,
+                                height=380,
                                 elem_classes="upload-area"
                             )
-                            
                             process_btn = gr.Button(
                                 "✨ 开始智能分析",
                                 variant="primary",
-                                size="lg",
-                                elem_classes="btn-primary"
+                                elem_classes="primary-btn"
                             )
                     
-                    # 右侧结果区
-                    with gr.Column(scale=1):
-                        with gr.Column(elem_classes="card"):
-                            gr.Markdown("### 📝 分析结果")
-                            
-                            with gr.Row():
-                                with gr.Column():
-                                    english_output = gr.Textbox(
-                                        label="🇬🇧 英文描述",
-                                        placeholder="英文描述将显示在这里...",
-                                        lines=4
-                                    )
-                            
-                            with gr.Row():
-                                with gr.Column():
-                                    chinese_output = gr.Textbox(
-                                        label="🇨🇳 中文描述",
-                                        placeholder="中文翻译将显示在这里...",
-                                        lines=4
-                                    )
-                            
-                            with gr.Row():
-                                save_status = gr.Textbox(
-                                    label="💾 保存状态",
-                                    placeholder="处理结果保存信息...",
+                    # 右侧面板：结果展示
+                    with gr.Column(elem_classes="right-panel"):
+                        with gr.Column(elem_classes="glass-card"):
+                            gr.HTML('<div class="card-header">📝 分析结果</div>')
+                            with gr.Column(elem_classes="output-textbox"):
+                                english_output = gr.Textbox(
+                                    label="🇬🇧 英文描述 (English)",
+                                    placeholder="等待分析...",
                                     lines=3,
                                     interactive=False
                                 )
+                            with gr.Column(elem_classes="output-textbox"):
+                                chinese_output = gr.Textbox(
+                                    label="🇨🇳 中文描述 (Chinese)",
+                                    placeholder="等待翻译...",
+                                    lines=3,
+                                    interactive=False
+                                )
+                            with gr.Column(elem_classes="output-textbox"):
+                                save_status = gr.Textbox(
+                                    label="💾 保存状态",
+                                    placeholder="结果保存信息",
+                                    lines=2,
+                                    interactive=False
+                                )
             
-            # 选项卡 2: 系统信息
-            with gr.TabItem("📊 系统状态", id=1):
-                with gr.Column(elem_classes="card"):
-                    gr.Markdown("### 📈 系统统计")
-                    
+            # ---------- 系统状态 ----------
+            with gr.TabItem("📊 系统状态"):
+                with gr.Column(elem_classes="glass-card"):
+                    gr.HTML('<div class="card-header">📈 运行统计</div>')
+                    stats_output = gr.JSON(label="系统统计信息", value=app.get_stats())
                     with gr.Row():
-                        with gr.Column():
-                            stats_output = gr.JSON(
-                                label="系统统计信息",
-                                value=app.get_stats()
-                            )
-                    
-                    with gr.Row():
-                        refresh_btn = gr.Button("🔄 刷新统计", variant="secondary")
-                    
-                    gr.Markdown("### 📁 文件位置")
-                    with gr.Row():
-                        with gr.Column():
-                            gr.Markdown(f"""
-                            - **🎨 模型目录**: `{app.base_path}`
-                            - **💾 结果目录**: `{app.results_path}`
-                            - **🔧 描述模型**: `{app.caption_model_path}`
-                            - **🌐 翻译模型**: `{app.trans_model_path}`
-                            """)
+                        refresh_btn = gr.Button("🔄 刷新统计", elem_classes="secondary-btn", size="sm")
+                    gr.HTML('<div class="card-header" style="margin-top: 1.5rem;">🗂️ 存储位置</div>')
+                    gr.Markdown(f"""
+                    <div class="path-box">
+                    🎨 模型目录：`{app.base_path}`<br>
+                    💾 结果目录：`{app.results_path}`<br>
+                    🔧 描述模型：`{app.caption_model_path}`<br>
+                    🌐 翻译模型：`{app.trans_model_path}`
+                    </div>
+                    """)
             
-            # 选项卡 3: 使用说明
-            with gr.TabItem("📚 使用指南", id=2):
-                with gr.Column(elem_classes="card"):
+            # ---------- 使用指南 ----------
+            with gr.TabItem("📚 使用指南"):
+                with gr.Column(elem_classes="glass-card"):
+                    gr.HTML('<div class="card-header">🚀 快速开始</div>')
                     gr.Markdown("""
-                    ### 🚀 快速开始
+                    **1. 上传图片** → 在「图像理解」标签页上传或拖拽图像  
+                    **2. 智能分析** → 点击「开始智能分析」按钮  
+                    **3. 查看结果** → 系统自动生成英文描述并翻译为中文  
+                    **4. 自动保存** → 结果保存至 `results/` 目录，便于回顾  
                     
-                    1. **上传图片**: 在"图像理解"标签页上传或拖放图片
-                    2. **智能分析**: 点击"开始智能分析"按钮
-                    3. **查看结果**: 系统会自动生成英文和中文描述
-                    4. **结果保存**: 处理结果会自动保存到 `results/` 目录
-                    
+                    ---
                     ### 🔧 技术特性
-                    
-                    - **📦 全本地运行**: 所有模型均保存在 `models/` 目录，无需网络
-                    - **🔒 隐私保护**: 您的图片和描述永远不会离开您的设备
-                    - **⚡ 高效推理**: 支持GPU加速，CPU模式也可流畅运行
-                    - **💾 自动存档**: 所有处理结果自动保存，方便查阅
+                    - **全本地运行** – 所有模型保存在 `models/` 目录，无需互联网  
+                    - **隐私安全** – 您的图像和描述永不离开本机  
+                    - **GPU/CPU 自适应** – 自动选择最佳推理设备  
+                    - **自动存档** – 每次处理结果自动保存为图像 + 文本文件  
                     
                     ### 🎯 模型信息
-                    
-                    - **视觉模型**: ViT-GPT2 (图像描述生成)
-                    - **翻译模型**: Helsinki-NLP Opus-MT (英译中)
-                    - **总大小**: 约1.2GB (首次运行自动下载)
+                    - **视觉模型**：ViT-GPT2（图像描述生成）  
+                    - **翻译模型**：Helsinki-NLP Opus-MT（英文 → 中文）  
+                    - **总大小**：约 1.2 GB（首次运行自动下载）  
                     
                     ### ❓ 常见问题
-                    
-                    **Q: 首次运行需要多久？**  
-                    A: 首次运行会自动下载约1.2GB模型文件，请确保网络畅通
-                    
-                    **Q: 支持什么格式的图片？**  
-                    A: 支持JPG、PNG、BMP等常见格式，最大分辨率4096x4096
-                    
-                    **Q: 如何清理缓存？**  
-                    A: 删除 `models/` 目录可重新下载，删除 `results/` 目录可清空历史记录
+                    - **首次运行慢？** 需要下载模型，请保持网络稳定  
+                    - **支持哪些图片格式？** JPG、PNG、BMP 等常见格式  
+                    - **如何清理缓存？** 删除 `models/` 目录可重新下载模型，删除 `results/` 可清空历史记录
                     """)
         
-        # 底部区域
+        # 底部
         with gr.Column(elem_classes="footer"):
-            gr.Markdown("""
-            ---
-            **🌐 离线智能图像理解系统** · 基于 ViT-GPT2 和 Opus-MT 构建  
-            📅 版本 2.0 · 🔒 全本地运行 · 🚀 基于 Gradio 6.0  
-            处理设备: **{}**
-            """.format(app.device.upper()))
+            gr.Markdown(f"""
+            **离线智能图像理解系统** · 基于 ViT-GPT2 和 Opus-MT  
+            🖥️ 当前设备：**{app.device.upper()}** · 🔒 全本地运行 · 🚀 Gradio 驱动
+            """)
     
-    # ================ 交互逻辑 ================
-    
-    # 图像分析功能
+    # ================ 交互逻辑（完全保留） ================
     process_btn.click(
         fn=app.generate_caption,
         inputs=input_image,
@@ -514,13 +619,11 @@ with gr.Blocks(title="🌌 离线智能图像理解系统") as demo:
         outputs=stats_output
     )
     
-    # 刷新统计信息
     refresh_btn.click(
         fn=lambda: app.get_stats(),
         outputs=stats_output
     )
     
-    # 清除输入时重置输出
     input_image.clear(
         fn=lambda: [None, None, "📭 已清空，请上传新图片"],
         outputs=[english_output, chinese_output, save_status]
@@ -535,22 +638,13 @@ if __name__ == "__main__":
     print("  1. 首次运行会自动下载约1.2GB模型文件")
     print("  2. 请确保网络连接稳定")
     print("  3. 模型下载后即可完全离线使用")
-    print("  4. 请访问:http://127.0.0.1:7860")
+    print("  4. 请访问: http://127.0.0.1:7860")
     print("="*60 + "\n")
     
-    my_theme = gr.themes.Soft(
-        primary_hue="indigo",
-        secondary_hue="purple",
-        neutral_hue="slate"
-    )
-
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
         share=False,
         debug=False,
-        favicon_path=None,
-        # 移到这里来 👇
-        theme=my_theme,
-        css=custom_css 
+        favicon_path=None
     )
